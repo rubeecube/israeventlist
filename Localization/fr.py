@@ -7,6 +7,9 @@ dic = {
     'retrieve location': "nous avous besoin localisation...",
     "share location": "Envoyer ma loc",
     'location not retrieved, we try later': 'loc not retrieved, we try later',
+    'thanks phone': 'Merci dqvoir blqblq',
+    'thanks location': 'Merci dqvoir blqblq',
+    'thanks interests': 'Merci dqvoir blqblq',
 }
 
 

@@ -1,4 +1,4 @@
-from IsraEventList.Localization import fr
+from Localization import fr
 
 
 def localize(key, lang):
