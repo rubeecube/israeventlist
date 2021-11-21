@@ -83,7 +83,7 @@ def fun_handle_location_err(update: Update, context: CallbackContext) -> int:
 def fun_ask_interests(update: Update, context: CallbackContext) -> int:
     max_len = max(map(len, Interests.BASE_INTERESTS.keys())) + 1 + len(EMOJI_SMILEY)
 
-    button_list = [[InlineKeyboardButton(choice.ljust(max_len), callback_data=choice)] for choice in Interests.BASE_INTERESTS.keys()]
+    button_list = [[InlineKeyboardButton("- %s" % choice.ljust(max_len), callback_data=choice)] for choice in Interests.BASE_INTERESTS.keys()]
     button_list += [[InlineKeyboardButton("Terminer", callback_data="***END***")]]
     reply_markup = InlineKeyboardMarkup(button_list, one_time_keyboard=True)
     print(reply_markup)
@@ -122,9 +122,9 @@ def fun_handle_interests(update: Update, context: CallbackContext) -> int:
     button_list = []
     for choice in Interests.BASE_INTERESTS.keys():
         if choice in chosen_data:
-            button_list += [[InlineKeyboardButton("%s %s".ljust(max_len) % (choice, EMOJI_SMILEY), callback_data=choice)]]
+            button_list += [[InlineKeyboardButton("- %s %s" % (choice.ljust(max_len), EMOJI_SMILEY), callback_data=choice)]]
         else:
-            button_list += [[InlineKeyboardButton(choice.ljust(max_len), callback_data=choice)]]
+            button_list += [[InlineKeyboardButton("- %s" % choice.ljust(max_len), callback_data=choice)]]
     button_list += [[InlineKeyboardButton("Terminer", callback_data="***END***")]]
     reply_markup = InlineKeyboardMarkup(button_list, one_time_keyboard=True)
 
