@@ -1,15 +1,6 @@
 import telegram
 from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import (
-    Updater,
-    CommandHandler,
-    MessageHandler,
-    Filters,
-    ConversationHandler,
-    CallbackQueryHandler,
-    PicklePersistence,
-    CallbackContext,
-)
+from telegram.ext import CallbackQueryHandler
 
 from config import TOKEN
 
@@ -17,8 +8,9 @@ from internals import *
 from StateManagement import *
 
 from Data.Interests import Interests
+from Globals import Globals
+from EventDatabase import EventDatabase
 
-EMOJI_SMILEY = "✔️"
 
 def fun_start(update: Update, context: CallbackContext) -> int:
     initialize(update, context)
@@ -29,7 +21,8 @@ def fun_start(update: Update, context: CallbackContext) -> int:
 
 
 def fun_ask_phone(update: Update, context: CallbackContext) -> int:
-    reply_markup = ReplyKeyboardMarkup([[KeyboardButton(localize('Share contact', "fr"), request_contact=True, one_time_keyboard = True)]])
+    reply_markup = ReplyKeyboardMarkup([[KeyboardButton(localize('Share contact', "fr"), request_contact=True,
+                                                        one_time_keyboard=True)]])
 
     update.message.reply_text(localize('retrieve phone', "fr"), reply_markup=reply_markup)
 
@@ -40,7 +33,7 @@ def fun_handle_phone(update: Update, context: CallbackContext) -> int:
     if update.effective_message.contact is None:
         return fun_handle_phone_err(update, context)
 
-    update.message.reply_text(update.effective_message.contact.phone_number)
+    save_phone(update, context)
 
     update.message.reply_text(localize('thanks phone', "fr"))
 
@@ -66,7 +59,7 @@ def fun_handle_location(update: Update, context: CallbackContext) -> int:
     if update.effective_message.location is None:
         return fun_handle_location_err(update, context)
 
-    update.message.reply_text(str(update.effective_message.location))
+    save_location(update, context)
 
     update.message.reply_text(localize('thanks location', "fr"))
 
@@ -81,12 +74,7 @@ def fun_handle_location_err(update: Update, context: CallbackContext) -> int:
 
 
 def fun_ask_interests(update: Update, context: CallbackContext) -> int:
-    max_len = max(map(len, Interests.BASE_INTERESTS.keys())) + 1 + len(EMOJI_SMILEY)
-
-    button_list = [[InlineKeyboardButton("- %s" % choice.ljust(max_len), callback_data=choice)] for choice in Interests.BASE_INTERESTS.keys()]
-    button_list += [[InlineKeyboardButton("Terminer", callback_data="***END***")]]
-    reply_markup = InlineKeyboardMarkup(button_list, one_time_keyboard=True)
-    print(reply_markup)
+    reply_markup = Interests.build_reply_markup()
 
     update.message.reply_text(localize('retrieve interests', "fr"), reply_markup=reply_markup)
 
@@ -97,18 +85,16 @@ def fun_handle_interests(update: Update, context: CallbackContext) -> int:
     chosen_data = []
     message = update.callback_query.message
     for inlinekb in message['reply_markup']['inline_keyboard']:
-        if EMOJI_SMILEY in inlinekb[0]['text']:
+        if Globals.EMOJI_OK in inlinekb[0]['text']:
             chosen_data += [inlinekb[0]['callback_data']]
 
     if update.callback_query.data == "***END***":
-        print(chosen_data)
+        save_interests(update, context, chosen_data)
 
         context.bot.edit_message_text(text=localize('thanks interests', "fr"),
                                       chat_id=update.callback_query.message.chat_id,
                                       message_id=update.callback_query.message.message_id,
                                       inline_message_id=update.callback_query.inline_message_id)
-
-        context.bot.send_message(chat_id=update.callback_query.message.chat_id, text=str(chosen_data))
 
         return fun_finish_init(update, context)
 
@@ -117,21 +103,10 @@ def fun_handle_interests(update: Update, context: CallbackContext) -> int:
     else:
         chosen_data += [update.callback_query.data]
 
-    max_len = max(map(len, Interests.BASE_INTERESTS.keys())) + 1 + len(EMOJI_SMILEY)
-
-    button_list = []
-    for choice in Interests.BASE_INTERESTS.keys():
-        if choice in chosen_data:
-            button_list += [[InlineKeyboardButton("- %s %s" % (choice.ljust(max_len), EMOJI_SMILEY), callback_data=choice)]]
-        else:
-            button_list += [[InlineKeyboardButton("- %s" % choice.ljust(max_len), callback_data=choice)]]
-    button_list += [[InlineKeyboardButton("Terminer", callback_data="***END***")]]
-    reply_markup = InlineKeyboardMarkup(button_list, one_time_keyboard=True)
-
     context.bot.edit_message_reply_markup(chat_id=update.callback_query.message.chat_id,
                                           message_id=update.callback_query.message.message_id,
                                           inline_message_id=update.callback_query.inline_message_id,
-                                          reply_markup=reply_markup)
+                                          reply_markup=Interests.build_reply_markup_edit(chosen_data))
     return HANDLE_INTERESTS
 
 
@@ -146,6 +121,12 @@ def fun_cancel(update: Update, context: CallbackContext) -> int:
     update.message.reply_text(localize("goodbye text", "fr"))
 
     return ConversationHandler.END
+
+
+def fun_contact(update: Update, context: CallbackContext) -> None:
+    update.message.reply_text("https://telegram.me/RubeeCube")
+
+    return None
 
 
 def main():
@@ -168,7 +149,7 @@ def main():
             #HELP: [MessageHandler(~Filters.command, fun_help)],
         },
         name="IsraEventList_bot",
-        fallbacks=[CommandHandler('cancel', fun_cancel)],
+        fallbacks=[CommandHandler('cancel', fun_cancel), CommandHandler('contact', fun_contact)],
         persistent=True,
         allow_reentry=True
     )
