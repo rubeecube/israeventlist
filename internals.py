@@ -47,7 +47,7 @@ def save_phone(update: Update, context: CallbackContext) -> None:
 
     user.user_data = context.user_data
 
-    user.misc['phone'] = update.effective_message.contact.phone_number
+    user.phone = update.effective_message.contact.phone_number
 
     customer_database.save_user(user)
     return
@@ -63,7 +63,7 @@ def save_location(update: Update, context: CallbackContext) -> None:
 
     user.user_data = context.user_data
 
-    user.misc['location'] = str(update.effective_message.location)
+    user.location = str(update.effective_message.location)
 
     customer_database.save_user(user)
 
@@ -80,7 +80,7 @@ def save_interests(update: Update, context: CallbackContext, interests) -> None:
 
     user.user_data = context.user_data
 
-    user.misc['location'] = str(update.effective_message.location)
+    user.interests = interests
 
     customer_database.save_user(user)
 

@@ -16,7 +16,7 @@ class Interests:
                                 for interest_level2 in parents[interest_level1['id']]]
                                for interest_level1 in interests.values() if interest_level1['id_parent'] is None]
         else:
-            interests_level = [[InlineKeyboardButton("- %s" % interest_level1['name'].ljust(max_len),  callback_data=interest_level1['id'])]
+            interests_level = [[InlineKeyboardButton("%s" % interest_level1['name'].ljust(max_len),  callback_data=interest_level1['id'])]
                                for interest_level1 in interests.values() if interest_level1['id_parent'] is None]
 
         interests_level = [item for sublist in interests_level for item in sublist]
