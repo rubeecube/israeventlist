@@ -5,7 +5,7 @@ from EventDatabase import EventDatabase
 
 class Interests:
     @staticmethod
-    def build_reply_markup(show_level2=False):
+    def build_reply_markup(show_level2=False, add_end_button=True):
         event_db = EventDatabase()
         interests, parents = event_db.get_interests()
         max_len = max([len(x['name']) for x in list(interests.values())]) + 3 + len(Globals.EMOJI_OK)
@@ -22,7 +22,8 @@ class Interests:
         interests_level = [item for sublist in interests_level for item in sublist]
 
         button_list = [[button] for button in interests_level]
-        button_list += [[InlineKeyboardButton("Terminer", callback_data="***END***")]]
+        if add_end_button:
+            button_list += [[InlineKeyboardButton("Terminer", callback_data="***END***")]]
         reply_markup = InlineKeyboardMarkup(button_list, one_time_keyboard=True)
 
         return reply_markup
