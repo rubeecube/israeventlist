@@ -1,7 +1,7 @@
 import json
 import sqlite3
 from Database import Database
-from Data.User import User
+from Unit import User
 
 
 class CustomerDatabase:

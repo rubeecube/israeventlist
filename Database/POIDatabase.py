@@ -1,6 +1,6 @@
 import sqlite3
 from Database import Database
-from Data.POI import POI
+from Unit import POI
 
 
 class POIDatabase:

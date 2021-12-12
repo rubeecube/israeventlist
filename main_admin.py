@@ -1,16 +1,26 @@
-import telegram
-from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import CallbackQueryHandler
+from telegram import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import (
+    Updater,
+    CommandHandler,
+    MessageHandler,
+    Filters,
+    ConversationHandler,
+    CallbackQueryHandler,
+    PicklePersistence,
+    CallbackContext,
+)
 
-from config import TOKEN
+from Storage.config import TOKEN
 
 from internals import *
 from StateManagement import *
 
-from Data.POI import POI
-from Data.Interests import Interests
-from Globals import Globals
-from POIDatabase import POIDatabase
+from Unit import POI
+
+from Interests import Interests
+
+from Database import POIDatabase
+from Localization import localize
 
 
 def fun_start(update: Update, context: CallbackContext) -> int:
@@ -21,7 +31,18 @@ def fun_start(update: Update, context: CallbackContext) -> int:
 
 
 def fun_add(update: Update, context: CallbackContext) -> int:
-    reply_markup = Interests.build_reply_markup(add_end_button=False)
+    list_add = ['POI']
+
+    button_list = [[InlineKeyboardButton("%s" % button,  callback_data=button)] for button in list_add]
+    reply_markup = InlineKeyboardMarkup(button_list, one_time_keyboard=True)
+
+    update.message.reply_text(localize('category', "fr"), reply_markup=reply_markup)
+
+    return POI_ADD
+
+
+def fun_add_poi(update: Update, context: CallbackContext) -> int:
+    reply_markup = Interests.build_reply_markup(show_level2=True, add_end_button=False)
 
     update.message.reply_text(localize('interest for add', "fr"), reply_markup=reply_markup)
 
@@ -99,14 +120,15 @@ def fun_handle_poi_add_address(update: Update, context: CallbackContext) -> int:
 
 
 def main():
-    persistence = PicklePersistence(filename='IsraEventListAdmin_bot')
+    persistence = PicklePersistence(filename='Storage/IsraEventListAdmin_bot')
     updater = Updater(TOKEN["IsraEventListAdmin_bot"], use_context=True, persistence=persistence)
 
     dispatcher = updater.dispatcher
 
     conv_handler = ConversationHandler(
-        entry_points=[CommandHandler('start', fun_start, Filters.user(username=["@RubeeCube"]))],
+        entry_points=[CommandHandler('start', fun_start, Filters.user(username=["@RubeeCube", "@Olivertwistis"]))],
         states={
+            POI_ADD: [MessageHandler(Filters.text & ~Filters.command, fun_add_poi)],
             POI_ADD_NAME: [MessageHandler(Filters.text & ~Filters.command, fun_handle_poi_add_name)],
             POI_ADD_DESC: [MessageHandler(Filters.text & ~Filters.command, fun_handle_poi_add_desc)],
             POI_ADD_ADDRESS: [MessageHandler(Filters.text & ~Filters.command, fun_handle_poi_add_address)],

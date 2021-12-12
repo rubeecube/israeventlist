@@ -1,18 +1,10 @@
-from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Update, KeyboardButton
+from telegram import Update
 from telegram.ext import (
-    Updater,
-    CommandHandler,
-    MessageHandler,
-    Filters,
-    ConversationHandler,
-    PicklePersistence,
     CallbackContext,
 
 )
-from Localization.dispatch import localize
-from StateManagement import *
-from Data.User import User
-from CustomerDatabase import CustomerDatabase
+from Unit import User
+from Database import CustomerDatabase
 
 
 def initialize(update: Update, context: CallbackContext) -> None:

@@ -2,7 +2,7 @@ import sqlite3
 from Database import Database
 
 
-class EventDatabase:
+class InterestDatabase:
     BASE_INTERESTS = {
         "Activités sportives": [
             "Football",
@@ -77,17 +77,17 @@ class EventDatabase:
                type_interest    TEXT
             );''')
 
-            for interest_level1 in sorted(EventDatabase.BASE_INTERESTS.keys()):
+            for interest_level1 in sorted(InterestDatabase.BASE_INTERESTS.keys()):
                 row = self.cur.execute('''INSERT INTO interests (name) VALUES (?);''', (interest_level1,))
                 parent_id = row.lastrowid
-                for interest_level2 in sorted(EventDatabase.BASE_INTERESTS[interest_level1]):
+                for interest_level2 in sorted(InterestDatabase.BASE_INTERESTS[interest_level1]):
                     self.cur.execute('''INSERT INTO interests (name, id_parent) VALUES (?, ?);''', (interest_level2,parent_id))
 
             self.con.commit()
 
     def get_interests(self):
-        if EventDatabase.INTERESTS is not None:
-            return EventDatabase.INTERESTS
+        if InterestDatabase.INTERESTS is not None:
+            return InterestDatabase.INTERESTS
 
         res = {}
         parents = {}
@@ -109,7 +109,7 @@ class EventDatabase:
                     "type_interest": type_interest
                 }]
 
-        EventDatabase.INTERESTS = res, parents
+        InterestDatabase.INTERESTS = res, parents
 
         return res, parents
 

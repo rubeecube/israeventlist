@@ -1,15 +1,25 @@
 import telegram
-from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import CallbackQueryHandler
+from telegram import ReplyKeyboardMarkup, KeyboardButton
+from telegram.ext import (
+    Updater,
+    CommandHandler,
+    MessageHandler,
+    Filters,
+    ConversationHandler,
+    CallbackQueryHandler,
+    PicklePersistence,
+    CallbackContext,
+)
 
-from config import TOKEN
+from Storage.config import TOKEN
 
 from internals import *
 from StateManagement import *
 
-from Data.Interests import Interests
+from Interests import Interests
 from Globals import Globals
-from EventDatabase import EventDatabase
+from Database import InterestDatabase
+from Localization import localize
 
 
 def fun_start(update: Update, context: CallbackContext) -> int:
@@ -130,7 +140,7 @@ def fun_contact(update: Update, context: CallbackContext) -> None:
 
 
 def main():
-    persistence = PicklePersistence(filename='IsraEventList_bot')
+    persistence = PicklePersistence(filename='Storage/IsraEventList_bot')
     updater = Updater(TOKEN["IsraEventList_bot"], use_context=True, persistence=persistence)
 
     dispatcher = updater.dispatcher
