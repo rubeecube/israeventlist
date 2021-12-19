@@ -1,93 +1,21 @@
 import sqlite3
-from Database import Database
+import Database
 
 
-class InterestDatabase:
-    BASE_INTERESTS = {
-        "Activités sportives": [
-            "Football",
-            "Paddle",
-            "Squash",
-            "Tennis",
-            "Treks/Tiyulim"
-        ],
-        "Culture": [
-            "Show",
-            "Soirée",
-            "Conférences",
-            "Concerts",
-        ],
-        "Synagogues": [
-            "Horaires",
-            "Mikvé",
-            "Activités",
-            "Cours",
-        ],
-        "Literature": [
-            "Nouveautés",
-            "Dédicaces"
-        ],
-        "Liens externes": [
-            "Sites utiles"
-        ],
-        "Boire/Manger": [
-            "Restaurants",
-            "Cafés",
-            "Bars"
-        ],
-        "Shabbats organisés": [
-            "Synagogues",
-            "Chez l'habitant",
-            "Traiteur",
-            "Jeunes",
-            "Celibataires",
-        ],
-        "Finances, Legal": [
-            "Entre-aide",
-            "Conseil",
-            "Chroniques"
-        ],
-        "Activités ados (-13)": [
-            "Treks/Tiyulim",
-            "Colonies",
-            "Talmud Thora"
-            "Cours privés",
-            "Musique",
-            "Tsaaron"
-        ]
-    }
-
-    INTERESTS = None
-
-    def __init__(self):
-        self.db = Database()
-        self.con = self.db.con
-        self.cur = self.db.con.cursor()
-        self.initialize()
-
+class InterestDatabase(Database.DatabaseHelper):
     def initialize(self):
-        try:
-            self.cur.execute('''SELECT * FROM interests;''')
-        except sqlite3.OperationalError:
-            self.cur.execute('''
-            CREATE TABLE interests (
+        self.table_name = 'interests'
+        self.table_schema = '''
+            CREATE TABLE %s (
                id               INTEGER     PRIMARY KEY     AUTOINCREMENT,
                name             TEXT        NOT NULL,
                id_parent        INTEGER,
                type_interest    TEXT
-            );''')
-
-            for interest_level1 in sorted(InterestDatabase.BASE_INTERESTS.keys()):
-                row = self.cur.execute('''INSERT INTO interests (name) VALUES (?);''', (interest_level1,))
-                parent_id = row.lastrowid
-                for interest_level2 in sorted(InterestDatabase.BASE_INTERESTS[interest_level1]):
-                    self.cur.execute('''INSERT INTO interests (name, id_parent) VALUES (?, ?);''', (interest_level2,parent_id))
-
-            self.con.commit()
+            );'''
 
     def get_interests(self):
-        if InterestDatabase.INTERESTS is not None:
-            return InterestDatabase.INTERESTS
+        if InterestDatabase.TEMP_DB is not None:
+            return InterestDatabase.TEMP_DB
 
         res = {}
         parents = {}
@@ -109,7 +37,7 @@ class InterestDatabase:
                     "type_interest": type_interest
                 }]
 
-        InterestDatabase.INTERESTS = res, parents
+        InterestDatabase.TEMP_DB = res, parents
 
         return res, parents
 

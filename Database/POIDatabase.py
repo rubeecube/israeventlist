@@ -1,37 +1,25 @@
 import sqlite3
-from Database import Database
+import Database
 from Unit import POI
 
 
-class POIDatabase:
-
-    POIs = None
-
-    def __init__(self):
-        self.db = Database()
-        self.con = self.db.con
-        self.cur = self.db.con.cursor()
-        self.initialize()
-
+class POIDatabase(Database.DatabaseHelper):
     def initialize(self):
-        try:
-            self.cur.execute('''SELECT * FROM poi;''')
-        except sqlite3.OperationalError:
-            self.cur.execute('''
-            CREATE TABLE poi (
+        self.table_name = 'poi'
+        self.table_schema = '''
+        CREATE TABLE %s (
                id               INTEGER     PRIMARY KEY     AUTOINCREMENT,
                name             TEXT        NOT NULL,
                description      TEXT,
                location         TEXT,
                address          TEXT,
                interest_id      INTEGER
-            );''')
-
-            self.con.commit()
+            );
+        '''
 
     def get_pois(self):
-        if POIDatabase.POIs is not None:
-            return POIDatabase.POIs
+        if POIDatabase.TEMP_DB is not None:
+            return POIDatabase.TEMP_DB
 
         res = {}
         query = self.cur.execute('''SELECT * FROM poi;''')
@@ -45,7 +33,7 @@ class POIDatabase:
                 "interest_id": interest_id
             }
 
-        POIDatabase.POIs = res
+        POIDatabase.TEMP_DB = res
 
         return res
 

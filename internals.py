@@ -1,10 +1,11 @@
-from telegram import Update
+from telegram import Update, KeyboardButton, ReplyKeyboardMarkup
 from telegram.ext import (
     CallbackContext,
 
 )
 from Unit import User
-from Database import CustomerDatabase
+from Database.UserDatabase import UserDatabase
+from Localization import localize
 
 
 def initialize(update: Update, context: CallbackContext) -> None:
@@ -23,16 +24,16 @@ def save_info(update: Update, context: CallbackContext) -> None:
         'language_code': update.effective_message.from_user.language_code,
     }
 
-    customer_database = CustomerDatabase()
-    customer_database.save_user(user)
+    user_database = UserDatabase()
+    user_database.save_user(user)
 
     return
 
 
 def save_phone(update: Update, context: CallbackContext) -> None:
-    customer_database = CustomerDatabase()
+    user_database = UserDatabase()
 
-    user = customer_database.get_user(update.effective_user.id)
+    user = user_database.get_user(update.effective_user.id)
     if user is None:
         user = User()
         user.telegram_id = update.effective_user.id
@@ -41,14 +42,14 @@ def save_phone(update: Update, context: CallbackContext) -> None:
 
     user.phone = update.effective_message.contact.phone_number
 
-    customer_database.save_user(user)
+    user_database.save_user(user)
     return
 
 
 def save_location(update: Update, context: CallbackContext) -> None:
-    customer_database = CustomerDatabase()
+    user_database = UserDatabase()
 
-    user = customer_database.get_user(update.effective_user.id)
+    user = user_database.get_user(update.effective_user.id)
     if user is None:
         user = User()
         user.telegram_id = update.effective_user.id
@@ -57,15 +58,15 @@ def save_location(update: Update, context: CallbackContext) -> None:
 
     user.location = str(update.effective_message.location)
 
-    customer_database.save_user(user)
+    user_database.save_user(user)
 
     return
 
 
 def save_interests(update: Update, context: CallbackContext, interests) -> None:
-    customer_database = CustomerDatabase()
+    user_database = UserDatabase()
 
-    user = customer_database.get_user(update.effective_user.id)
+    user = user_database.get_user(update.effective_user.id)
     if user is None:
         user = User()
         user.interests = interests
@@ -74,10 +75,31 @@ def save_interests(update: Update, context: CallbackContext, interests) -> None:
 
     user.interests = interests
 
-    customer_database.save_user(user)
+    user_database.save_user(user)
 
     return
 
+
+def get_interests(update: Update, context: CallbackContext) -> None | list:
+    user_database = UserDatabase()
+
+    user = user_database.get_user(update.effective_user.id)
+    if user is None:
+        return None
+
+    return user.interests
+
+
+def get_commands():
+    button_list = []
+    for command in ["interests", "phone", "location", "commands", "contact", "cancel"]:
+        button_list += [[
+            KeyboardButton("/%s - %s" % (command, localize("command %s" % command, "fr"))),
+        ]]
+
+    reply = ReplyKeyboardMarkup(button_list, one_time_keyboard=True)
+
+    return reply
 
 def set_jobs(update: Update, context: CallbackContext) -> None:
     return

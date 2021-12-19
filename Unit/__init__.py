@@ -1,6 +1,10 @@
 class Unit:
     attr = None
 
+    def __init__(self):
+        for attr in self.attr:
+            object.__setattr__(self, attr, None)
+
     def __setattr__(self, key, value):
         if self.attr is not None and key in self.attr:
             object.__setattr__(self, key, value)
@@ -9,7 +13,7 @@ class Unit:
 
     def __getattr__(self, key):
         if self.attr is not None and key in self.attr:
-            return object.__getattr__(self, key)
+            return object.__getattribute__(self, key)
         else:
             raise AttributeError
 

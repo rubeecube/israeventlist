@@ -1,4 +1,4 @@
-from telegram import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
     Updater,
     CommandHandler,
@@ -6,8 +6,7 @@ from telegram.ext import (
     Filters,
     ConversationHandler,
     CallbackQueryHandler,
-    PicklePersistence,
-    CallbackContext,
+    PicklePersistence
 )
 
 from Storage.config import TOKEN

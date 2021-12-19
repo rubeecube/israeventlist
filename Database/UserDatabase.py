@@ -1,24 +1,14 @@
 import json
 import sqlite3
-from Database import Database
+import Database
 from Unit import User
 
 
-class CustomerDatabase:
-    db = None
-    con = None
-    cur = None
-
-    def __init__(self):
-        self.db = Database()
-        self.con = self.db.con
-        self.cur = self.db.con.cursor()
-
-        try:
-            self.cur.execute('''SELECT * FROM users;''')
-        except sqlite3.OperationalError:
-            self.cur.execute('''
-            CREATE TABLE users (
+class UserDatabase(Database.DatabaseHelper):
+    def initialize(self):
+        self.table_name = 'users'
+        self.table_schema = '''
+            CREATE TABLE %s (
                id               INTEGER     PRIMARY KEY     AUTOINCREMENT,
                user_data        TEXT        NOT NULL,
                misc             TEXT,
@@ -26,9 +16,7 @@ class CustomerDatabase:
                phone            TEXT,
                location         TEXT,
                telegram_id      TEXT        UNIQUE
-            );''')
-
-            self.con.commit()
+            );'''
 
     def save_user(self, user: User):
         user_data = None

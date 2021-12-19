@@ -1,4 +1,5 @@
 import telegram
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram import ReplyKeyboardMarkup, KeyboardButton
 from telegram.ext import (
     Updater,
@@ -22,12 +23,20 @@ from Database import InterestDatabase
 from Localization import localize
 
 
-def fun_start(update: Update, context: CallbackContext) -> int:
+def fun_start(update: Update, context: CallbackContext) -> None | int:
     initialize(update, context)
 
     update.message.reply_text(localize("welcome text", "fr"))
 
-    return fun_ask_phone(update, context)
+    return fun_commands(update, context)
+
+
+def fun_commands(update: Update, context: CallbackContext) -> None | int:
+    reply = get_commands()
+
+    update.message.reply_text(localize("command list", "fr"), reply_markup=reply)
+
+    return NOMINAL
 
 
 def fun_ask_phone(update: Update, context: CallbackContext) -> int:
@@ -47,14 +56,14 @@ def fun_handle_phone(update: Update, context: CallbackContext) -> int:
 
     update.message.reply_text(localize('thanks phone', "fr"))
 
-    return fun_ask_location(update, context)
+    return fun_commands(update, context)
 
 
 def fun_handle_phone_err(update: Update, context: CallbackContext) -> int:
 
     update.message.reply_text(localize('phone not retrieved, we try later', "fr"))
 
-    return AFTER_PHONE
+    return fun_commands(update, context)
 
 
 def fun_ask_location(update: Update, context: CallbackContext) -> int:
@@ -73,18 +82,20 @@ def fun_handle_location(update: Update, context: CallbackContext) -> int:
 
     update.message.reply_text(localize('thanks location', "fr"))
 
-    return fun_ask_interests(update, context)
+    return fun_commands(update, context)
 
 
 def fun_handle_location_err(update: Update, context: CallbackContext) -> int:
 
     update.message.reply_text(localize('location not retrieved, we try later', "fr"))
 
-    return AFTER_LOCATION
+    return fun_commands(update, context)
 
 
 def fun_ask_interests(update: Update, context: CallbackContext) -> int:
-    reply_markup = Interests.build_reply_markup()
+    interests = get_interests(update, context)
+
+    reply_markup = Interests.build_reply_markup_edit(interests)
 
     update.message.reply_text(localize('retrieve interests', "fr"), reply_markup=reply_markup)
 
@@ -94,19 +105,30 @@ def fun_ask_interests(update: Update, context: CallbackContext) -> int:
 def fun_handle_interests(update: Update, context: CallbackContext) -> int:
     chosen_data = []
     message = update.callback_query.message
+
     for inlinekb in message['reply_markup']['inline_keyboard']:
-        if Globals.EMOJI_OK in inlinekb[0]['text']:
-            chosen_data += [inlinekb[0]['callback_data']]
+        if len(inlinekb) > 1 and inlinekb[1]['text'] == Globals.EMOJI_CHECKED:
+            chosen_data += [inlinekb[1]['callback_data']]
 
     if update.callback_query.data == "***END***":
         save_interests(update, context, chosen_data)
 
-        context.bot.edit_message_text(text=localize('thanks interests', "fr"),
-                                      chat_id=update.callback_query.message.chat_id,
-                                      message_id=update.callback_query.message.message_id,
-                                      inline_message_id=update.callback_query.inline_message_id)
+        context.bot.edit_message_reply_markup(chat_id=update.callback_query.message.chat_id,
+                                              message_id=update.callback_query.message.message_id,
+                                              inline_message_id=update.callback_query.inline_message_id,
+                                              reply_markup=Interests.build_reply_markup_edit(
+                                                  chosen_data,
+                                                  add_end_button=False,
+                                                  only_selected=True
+                                              ))
 
-        return fun_finish_init(update, context)
+        context.bot.send_message(chat_id=update.callback_query.message.chat_id, text=localize('thanks interests', 'fr'))
+
+        context.bot.send_message(chat_id=update.callback_query.message.chat_id,
+                                 text=localize("command list", "fr"),
+                                 reply_markup=get_commands())
+
+        return NOMINAL
 
     if update.callback_query.data in chosen_data:
         chosen_data.remove(update.callback_query.data)
@@ -134,9 +156,11 @@ def fun_cancel(update: Update, context: CallbackContext) -> int:
 
 
 def fun_contact(update: Update, context: CallbackContext) -> None:
+    update.message.reply_text(localize("contact us", "fr"))
+
     update.message.reply_text("https://telegram.me/RubeeCube")
 
-    return None
+    return fun_commands(update, context)
 
 
 def main():
@@ -146,7 +170,10 @@ def main():
     dispatcher = updater.dispatcher
 
     conv_handler = ConversationHandler(
-        entry_points=[CommandHandler('start', fun_start)],
+        entry_points=[
+            CommandHandler('start', fun_start),
+            CommandHandler('contact', fun_contact)
+        ],
         states={
             ASK_PHONE: [MessageHandler(Filters.text & ~Filters.command, fun_ask_phone)],
             HANDLE_PHONE: [MessageHandler(~Filters.command , fun_handle_phone)],
@@ -159,7 +186,14 @@ def main():
             #HELP: [MessageHandler(~Filters.command, fun_help)],
         },
         name="IsraEventList_bot",
-        fallbacks=[CommandHandler('cancel', fun_cancel), CommandHandler('contact', fun_contact)],
+        fallbacks=[
+            CommandHandler('cancel', fun_cancel),
+            CommandHandler('phone', fun_ask_phone),
+            CommandHandler('location', fun_ask_location),
+            CommandHandler('commands', fun_commands),
+            CommandHandler('contact', fun_contact),
+            CommandHandler('interests', fun_ask_interests)
+        ],
         persistent=True,
         allow_reentry=True
     )
