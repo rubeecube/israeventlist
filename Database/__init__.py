@@ -94,4 +94,3 @@ class DatabaseHelper:
                 self.con.commit()
             except sqlite3.OperationalError:
                 pass
-

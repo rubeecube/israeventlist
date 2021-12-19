@@ -17,10 +17,7 @@ class POIDatabase(Database.DatabaseHelper):
             );
         '''
 
-    def get_pois(self):
-        if POIDatabase.TEMP_DB is not None:
-            return POIDatabase.TEMP_DB
-
+    def get_all(self):
         res = {}
         query = self.cur.execute('''SELECT * FROM poi;''')
         for (identity, name, description, location, address, interest_id) in query.fetchall():
@@ -37,7 +34,7 @@ class POIDatabase(Database.DatabaseHelper):
 
         return res
 
-    def save_poi(self, poi: POI):
+    def save(self, poi: POI):
         row = self.cur.execute('''INSERT INTO poi
          (name, description, location, address, interest_id) VALUES
          (?, ?, ?, ?, ?);''',

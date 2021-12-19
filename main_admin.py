@@ -1,4 +1,4 @@
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, BotCommand
 from telegram.ext import (
     Updater,
     CommandHandler,
@@ -9,90 +9,178 @@ from telegram.ext import (
     PicklePersistence
 )
 
-from Storage.config import TOKEN
+from Storage.config import TOKEN, ADMINS
 
 from internals import *
-from StateManagement import *
+from internals_admin import *
+from StateManagement_admin import *
 
-from Unit import POI
+from Unit import POI, Interest
 
 from Interests import Interests
 
-from Database import POIDatabase
+from Database.POIDatabase import POIDatabase
+from Database.InterestDatabase import InterestDatabase
 from Localization import localize
 
 
-def fun_start(update: Update, context: CallbackContext) -> int:
-
-    update.message.reply_text(localize("welcome admin", "fr"))
+def funa_start(update: Update, context: CallbackContext) -> int:
+    update.message.reply_text(localize("welcome admin", get_lang(update)))
 
     return AUTHENTICATED
 
 
-def fun_add(update: Update, context: CallbackContext) -> int:
-    list_add = ['POI']
+def funa_commands(update: Update, context: CallbackContext) -> None | int:
+    reply = get_commands_admin(get_lang(update), exclude=["/stop"])
 
-    button_list = [[InlineKeyboardButton("%s" % button,  callback_data=button)] for button in list_add]
+    update.message.reply_text(localize("command_admin list", get_lang(update)), reply_markup=reply)
+
+    return None
+
+
+def funa_add(update: Update, context: CallbackContext) -> int:
+    list_add = ['poi', 'interest']
+    list_add = [(l, localize(l, get_lang(update))) for l in list_add]
+
+    button_list = [[InlineKeyboardButton(text,  callback_data=key)] for (key, text) in list_add]
     reply_markup = InlineKeyboardMarkup(button_list, one_time_keyboard=True)
 
-    update.message.reply_text(localize('category', "fr"), reply_markup=reply_markup)
+    update.message.reply_text(localize('admin add category', get_lang(update)), reply_markup=reply_markup)
 
-    return POI_ADD
-
-
-def fun_add_poi(update: Update, context: CallbackContext) -> int:
-    reply_markup = Interests.build_reply_markup(show_level2=True, add_end_button=False)
-
-    update.message.reply_text(localize('interest for add', "fr"), reply_markup=reply_markup)
-
-    return POI_ADD_INTEREST
+    return ADD
 
 
-def fun_handle_poi_add_interest(update: Update, context: CallbackContext) -> int:
-    interest_id = update.callback_query.data
+def funa_handle_add(update: Update, context: CallbackContext) -> int:
+    key = update.callback_query.data
 
-    context.chat_data['POI_ADD_interest_id'] = interest_id
+    if key == 'poi':
+        return funa_handle_add_poi(update, context)
 
-    context.bot.edit_message_text(text=localize('thanks interests admin', "fr"),
+    if key == 'interest':
+        return funa_handle_add_interest(update, context)
+
+
+def funa_handle_add_interest(update: Update, context: CallbackContext) -> int:
+    reply_markup = Interests.build_reply_markup(show_level2=False,
+                                                add_begin_button=[(localize("no parent interest", get_lang(update)),
+                                                                   "**NOPARENT**")])
+
+    context.bot.send_message(text=localize('interest for add', get_lang(update)),
+                             chat_id=update.callback_query.message.chat_id,
+                             reply_markup=reply_markup)
+
+    return INTEREST_ADD_PARENT
+
+
+def funa_handle_interest_add_parent(update: Update, context: CallbackContext) -> int:
+    id_parent = update.callback_query.data
+
+    interest_db = InterestDatabase()
+    interests, parents = interest_db.get_all()
+
+    if id_parent == "**NOPARENT**":
+        id_parent = None
+    elif int(id_parent) not in interests.keys():
+        context.bot.send_message(text=localize('error', get_lang(update)),
+                                 chat_id=update.callback_query.message.chat_id)
+        return AUTHENTICATED
+
+    context.chat_data['INTEREST_ADD_id_parent'] = id_parent
+
+    context.bot.edit_message_text(text=localize('saved', get_lang(update)),
                                   chat_id=update.callback_query.message.chat_id,
                                   message_id=update.callback_query.message.message_id,
                                   inline_message_id=update.callback_query.inline_message_id)
 
-    context.bot.send_message(text= localize('name of poi?', "fr"),
+    context.bot.send_message(text= localize('name of interest', get_lang(update)),
+                             chat_id=update.callback_query.message.chat_id)
+
+    return INTEREST_ADD_NAME
+
+
+def funa_interest_add_name(update: Update, context: CallbackContext) -> int:
+    message = update.message.text
+
+    context.chat_data['INTEREST_ADD_name'] = message
+
+    interest = Interest()
+    interest.name = context.chat_data['INTEREST_ADD_name']
+    interest.id_parent = context.chat_data['INTEREST_ADD_id_parent']
+
+    context.chat_data.pop("INTEREST_ADD_name")
+    context.chat_data.pop("INTEREST_ADD_id_parent")
+
+    interest_database = InterestDatabase()
+    interest_database.save(interest)
+
+    update.message.reply_text(localize('saved', get_lang(update)))
+
+    return AUTHENTICATED
+
+
+def funa_handle_add_poi(update: Update, context: CallbackContext) -> int:
+    reply_markup = Interests.build_reply_markup(show_level2=True)
+
+    context.bot.send_message(text=localize('interest for add', get_lang(update)),
+                             chat_id=update.callback_query.message.chat_id,
+                             reply_markup=reply_markup)
+
+    return POI_ADD_INTEREST
+
+
+def funa_handle_poi_add_interest(update: Update, context: CallbackContext) -> int:
+    interest_id = update.callback_query.data
+
+    interest_db = InterestDatabase()
+    interests, parents = interest_db.get_all()
+
+    if int(interest_id) not in interests.keys():
+        context.bot.send_message(text=localize('error', get_lang(update)),
+                                 chat_id=update.callback_query.message.chat_id)
+        return AUTHENTICATED
+
+    context.chat_data['POI_ADD_interest_id'] = interest_id
+
+    context.bot.edit_message_text(text=localize('saved', get_lang(update)),
+                                  chat_id=update.callback_query.message.chat_id,
+                                  message_id=update.callback_query.message.message_id,
+                                  inline_message_id=update.callback_query.inline_message_id)
+
+    context.bot.send_message(text= localize('name of poi', get_lang(update)),
                              chat_id=update.callback_query.message.chat_id)
 
     return POI_ADD_NAME
 
 
-def fun_handle_poi_add_name(update: Update, context: CallbackContext) -> int:
+def funa_handle_poi_add_name(update: Update, context: CallbackContext) -> int:
     message = update.message.text
 
     context.chat_data['POI_ADD_name'] = message
 
-    update.message.reply_text(localize('description of poi?', "fr"))
+    update.message.reply_text(localize('desc of poi', get_lang(update)))
 
     return POI_ADD_DESC
 
 
-def fun_handle_poi_add_desc(update: Update, context: CallbackContext) -> int:
+def funa_handle_poi_add_desc(update: Update, context: CallbackContext) -> int:
     message = update.message.text
 
     context.chat_data['POI_ADD_description'] = message
 
-    update.message.reply_text(localize('location of poi?', "fr"))
+    update.message.reply_text(localize('location of poi', get_lang(update)))
 
     return POI_ADD_LOCATION
 
 
-def fun_handle_poi_add_location(update: Update, context: CallbackContext) -> int:
+def funa_handle_poi_add_location(update: Update, context: CallbackContext) -> int:
     context.chat_data['POI_ADD_location'] = str(update.effective_message.location)
 
-    update.message.reply_text(localize('address of poi?', "fr"))
+    update.message.reply_text(localize('address of poi', get_lang(update)))
 
     return POI_ADD_ADDRESS
 
 
-def fun_handle_poi_add_address(update: Update, context: CallbackContext) -> int:
+def funa_handle_poi_add_address(update: Update, context: CallbackContext) -> int:
     message = update.message.text
 
     context.chat_data['POI_ADD_address'] = message
@@ -111,9 +199,16 @@ def fun_handle_poi_add_address(update: Update, context: CallbackContext) -> int:
     context.chat_data.pop("POI_ADD_interest_id")
 
     poi_database = POIDatabase()
-    poi_database.save_poi(poi)
+    poi_database.save(poi)
 
-    update.message.reply_text(localize('Saved', "fr"))
+    update.message.reply_text(localize('saved', get_lang(update)))
+
+    return AUTHENTICATED
+
+
+def funa_nominal(update: Update, context: CallbackContext) -> int:
+    if update.message.text == localize("exit menu", get_lang(update)):
+        update.message.reply_text(localize('inform commands', get_lang(update)))
 
     return AUTHENTICATED
 
@@ -122,20 +217,31 @@ def main():
     persistence = PicklePersistence(filename='Storage/IsraEventListAdmin_bot')
     updater = Updater(TOKEN["IsraEventListAdmin_bot"], use_context=True, persistence=persistence)
 
+    for lang in ["fr", "il", "en"]:
+        updater.bot.set_my_commands([BotCommand(c, d) for (c, d) in get_raw_commands_admin(lang)])
+
     dispatcher = updater.dispatcher
 
+    filter_admin = Filters.user(username=ADMINS)
+
     conv_handler = ConversationHandler(
-        entry_points=[CommandHandler('start', fun_start, Filters.user(username=["@RubeeCube", "@Olivertwistis"]))],
+        entry_points=[CommandHandler('start', funa_start, filter_admin)],
         states={
-            POI_ADD: [MessageHandler(Filters.text & ~Filters.command, fun_add_poi)],
-            POI_ADD_NAME: [MessageHandler(Filters.text & ~Filters.command, fun_handle_poi_add_name)],
-            POI_ADD_DESC: [MessageHandler(Filters.text & ~Filters.command, fun_handle_poi_add_desc)],
-            POI_ADD_ADDRESS: [MessageHandler(Filters.text & ~Filters.command, fun_handle_poi_add_address)],
-            POI_ADD_INTEREST: [CallbackQueryHandler(fun_handle_poi_add_interest)],
-            POI_ADD_LOCATION: [MessageHandler(Filters.location & ~Filters.command, fun_handle_poi_add_location)],
+            AUTHENTICATED: [MessageHandler(~Filters.command & filter_admin, funa_nominal)],
+            ADD: [CallbackQueryHandler(funa_handle_add)],
+            POI_ADD_NAME: [MessageHandler(Filters.text & ~Filters.command & filter_admin, funa_handle_poi_add_name)],
+            POI_ADD_DESC: [MessageHandler(Filters.text & ~Filters.command & filter_admin, funa_handle_poi_add_desc)],
+            POI_ADD_ADDRESS: [MessageHandler(Filters.text & ~Filters.command & filter_admin, funa_handle_poi_add_address)],
+            POI_ADD_INTEREST: [CallbackQueryHandler(funa_handle_poi_add_interest)],
+            POI_ADD_LOCATION: [MessageHandler(Filters.location & ~Filters.command & filter_admin, funa_handle_poi_add_location)],
+            INTEREST_ADD_PARENT: [CallbackQueryHandler(funa_handle_interest_add_parent)],
+            INTEREST_ADD_NAME: [MessageHandler(Filters.text & ~Filters.command & filter_admin, funa_interest_add_name)],
         },
         name="IsraEventListAdmin_bot",
-        fallbacks=[CommandHandler('add', fun_add)],
+        fallbacks=[
+            CommandHandler('add', funa_add, filter_admin),
+            CommandHandler('commands', funa_commands, filter_admin),
+        ],
         persistent=True,
         allow_reentry=True
     )

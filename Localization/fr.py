@@ -5,7 +5,8 @@ dic = {
                     "liste de l’ensemble des activités sur Tel Aviv ! Du Petit dej casher aux spectacles en passant par"
                     " les cours et les diners organises, excursions, soirées ... Vous n’avez qu’à sélectionner vos"
                     " centres d'intérêt et vous recevrez les notifications, c'est simple, c’est gratuit, c'est génial."
-                    " Vous pouvez la retrouver à tout moment en envoyant /commands .",
+                    " Vous pouvez retrouver la liste des commandes à tout moment en envoyant /commands ."
+                    " Le service peut être arrété en envoyant /stop",
     "goodbye text": "Nous sommes heureux de vous compter parmi nous, n’hésitez pas à nous remonter vos remarques pour"
                     " que nous puissions nous améliorer en utilisant la commande /contact. Pour recommencer utilisez "
                     "la commande /start",
@@ -24,12 +25,35 @@ dic = {
     'finish interests': "J'ai terminé %s" % (Globals.EMOJI_THUMBS_UP),
     "contact us": "Vous pouvez envoyer vos suggestions directement à tout moment.",
     "command list": "Veuillez choisir:",
+
     "command interests": "Choisir ou éditer mes interêts.",
     "command phone": "Partager mon numéro de téléphone.",
     "command location": "Partager ma localisation.",
     "command commands": "Voir la liste des commmandes.",
     "command contact": "Contactez nous.",
-    "command cancel": "Arrêter le service."
+    "command stop": "Arrêter le service.",
+    "command search": "Recherche.",
+
+    "exit menu": "Sortir du menu",
+    "inform commands": "Vous pouvez retrouver la liste des commandes à tout moment en envoyant /commands",
+
+    # Admin
+    "welcome admin": "Bonjour, bienvenue sur la partie admin de @IsraEventList_bot, pour voir la liste des commandes, "
+                     "envoyez /commands",
+    "command_admin add": "Ajouter une entrée.",
+    "command_admin commands": "Voir la liste des commandes.",
+    "command_admin list": "Veuillez choisir:",
+    "admin add category": "Choisir la catégorie:",
+    'saved': "Enregistré.",
+    'name of poi': "Nom du POI?",
+    'desc of poi': "Description du POI?",
+    'location of poi': "Localisation GPS du POI?",
+    'address of poi': "Adresse du POI?",
+    'interest for add': "Choisir le centre d'interêt:",
+    'poi': "Emplacement",
+    'interest': "Catégorie d'interêt",
+    "no parent interest": "Interêt principal (Pas de parent)",
+    'name of interest': "Nom du centre d'interêt?",
 }
 
 

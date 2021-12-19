@@ -8,6 +8,10 @@ from Database.UserDatabase import UserDatabase
 from Localization import localize
 
 
+def get_lang(update: Update):
+    return update.effective_message.from_user.language_code
+
+
 def initialize(update: Update, context: CallbackContext) -> None:
     save_info(update, context)
     set_jobs(update, context)
@@ -21,7 +25,7 @@ def save_info(update: Update, context: CallbackContext) -> None:
     user.user_data = context.user_data
     user.misc = {
         'first_name': update.effective_chat.first_name,
-        'language_code': update.effective_message.from_user.language_code,
+        'language_code': get_lang(update),
     }
 
     user_database = UserDatabase()
@@ -90,16 +94,31 @@ def get_interests(update: Update, context: CallbackContext) -> None | list:
     return user.interests
 
 
-def get_commands():
+def get_raw_commands(lang="fr"):
+    commands = []
+    for command in ["commands", "search", "interests", "phone", "location", "contact", "stop"]:
+        commands += [
+            ("/%s" % command, "%s" % localize("command %s" % command, lang)),
+        ]
+    return commands
+
+
+def get_commands(lang="fr", exclude=None):
     button_list = []
-    for command in ["interests", "phone", "location", "commands", "contact", "cancel"]:
+    for command, desc in get_raw_commands(lang):
+        if exclude is not None and command in exclude:
+            continue
         button_list += [[
-            KeyboardButton("/%s - %s" % (command, localize("command %s" % command, "fr"))),
+            KeyboardButton("%s - %s" % (command, desc)),
         ]]
+    button_list += [[
+        KeyboardButton(localize("exit menu", lang))
+    ]]
 
     reply = ReplyKeyboardMarkup(button_list, one_time_keyboard=True)
 
     return reply
+
 
 def set_jobs(update: Update, context: CallbackContext) -> None:
     return

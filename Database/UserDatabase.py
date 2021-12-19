@@ -18,7 +18,7 @@ class UserDatabase(Database.DatabaseHelper):
                telegram_id      TEXT        UNIQUE
             );'''
 
-    def save_user(self, user: User):
+    def save(self, user: User):
         user_data = None
         misc = None
         interests = None
@@ -48,7 +48,7 @@ class UserDatabase(Database.DatabaseHelper):
         else:
             return None
 
-    def get_user(self, telegram_id):
+    def get(self, telegram_id):
         rows = self.cur.execute("SELECT * FROM users WHERE telegram_id = ?;", (str(telegram_id), ))
 
         row = rows.fetchone()

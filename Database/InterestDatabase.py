@@ -1,5 +1,6 @@
 import sqlite3
 import Database
+from Unit import Interest
 
 
 class InterestDatabase(Database.DatabaseHelper):
@@ -13,10 +14,7 @@ class InterestDatabase(Database.DatabaseHelper):
                type_interest    TEXT
             );'''
 
-    def get_interests(self):
-        if InterestDatabase.TEMP_DB is not None:
-            return InterestDatabase.TEMP_DB
-
+    def get_all(self):
         res = {}
         parents = {}
         query = self.cur.execute('''SELECT * FROM interests;''')
@@ -41,4 +39,12 @@ class InterestDatabase(Database.DatabaseHelper):
 
         return res, parents
 
+    def save(self, interest: Interest):
+        row = self.cur.execute('''INSERT INTO interests
+         (name, id_parent, type_interest) VALUES
+         (?, ?, ?);''',
+         (interest.name, interest.id_parent, interest.type_interest))
 
+        self.con.commit()
+
+        return interest

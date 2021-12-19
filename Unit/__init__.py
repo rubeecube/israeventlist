@@ -28,3 +28,7 @@ class POI (Unit):
 
 class User(Unit):
     attr = ['telegram_id', 'phone', 'location', 'user_data', 'interests', 'misc']
+
+
+class Interest(Unit):
+    attr = ['name', 'id_parent', 'type_interest']

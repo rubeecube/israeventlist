@@ -2,17 +2,29 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from Globals import Globals
 from Database.InterestDatabase import InterestDatabase
 from Localization import localize
+from typing import List, Tuple
 
 
 class Interests:
     @staticmethod
-    def build_reply_markup_edit(chosen_data, show_level2=False, add_end_button=True, only_selected=False):
-        event_db = InterestDatabase()
-        interests, parents = event_db.get_interests()
+    def build_reply_markup(
+            chosen_data=None,
+            show_level2=False,
+            add_begin_button: List[Tuple] | None = None,
+            add_end_button: List[Tuple] | None = None,
+            only_selected=False,
+
+    ) -> InlineKeyboardMarkup:
+        interest_db = InterestDatabase()
+        interests, parents = interest_db.get_all()
         max_len = max([len(x['name']) for x in list(interests.values())]) + 3 + len(Globals.EMOJI_OK)
 
         button_list = []
         button_selected = []
+
+        if isinstance(add_begin_button, list):
+            button_list += [[InlineKeyboardButton(text, callback_data=key) for (text, key) in add_begin_button]]
+
         for interest_level1 in interests.values():
             if interest_level1['id_parent'] is not None:
                 continue
@@ -40,8 +52,8 @@ class Interests:
 
                     button_list += [[button1, button2]]
 
-        if add_end_button:
-            button_list += [[InlineKeyboardButton(localize('finish interests', 'fr'), callback_data="***END***")]]
+        if isinstance(add_end_button, list):
+            button_list += [[InlineKeyboardButton(text, callback_data=key) for (text, key) in add_end_button]]
 
         if only_selected:
             reply_markup = InlineKeyboardMarkup(button_selected, one_time_keyboard=True)
