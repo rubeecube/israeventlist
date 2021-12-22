@@ -22,7 +22,7 @@ dic = {
     'thanks location': "Merci d'avoir partagé votre localisation.",
     'thanks interests': "Merci d'avoir partagé vos centres d'interêts.",
     'retrieve interests': "Choisissez un ou plusieurs centre d'interêt.",
-    'finish interests': "J'ai terminé %s" % (Globals.EMOJI_THUMBS_UP),
+    'finish': "J'ai terminé %s" % (Globals.EMOJI_THUMBS_UP),
     "contact us": "Vous pouvez envoyer vos suggestions directement à tout moment.",
     "command list": "Veuillez choisir:",
 
@@ -36,6 +36,13 @@ dic = {
 
     "exit menu": "Sortir du menu",
     "inform commands": "Vous pouvez retrouver la liste des commandes à tout moment en envoyant /commands",
+    'search category': "Recherche selon:",
+
+    'poi for search': "Choisir le point d'interêt:",
+    'inerest for search': "Choisir le centre d'interêt:",
+    'no event found for poi, showing all': "Pas d'événement trouvé pour ce point d'interêt,"
+                                           " voici les résultats pour une recherche plus large",
+    'shpwing events': "Voici les résultats:",
 
     # Admin
     "welcome admin": "Bonjour, bienvenue sur la partie admin de @IsraEventList_bot, pour voir la liste des commandes, "
@@ -45,15 +52,35 @@ dic = {
     "command_admin list": "Veuillez choisir:",
     "admin add category": "Choisir la catégorie:",
     'saved': "Enregistré.",
+
     'name of poi': "Nom du POI?",
+    'name of event': "Nom de l'événement?",
+
     'desc of poi': "Description du POI?",
+    'desc of event': "Description de l'événement?",
+
     'location of poi': "Localisation GPS du POI?",
     'address of poi': "Adresse du POI?",
+
     'interest for add': "Choisir le centre d'interêt:",
+    'poi for add': "Choisir le point d'interêt:",
+
     'poi': "Emplacement",
     'interest': "Catégorie d'interêt",
+    'event': "Evénement",
+
     "no parent interest": "Interêt principal (Pas de parent)",
     'name of interest': "Nom du centre d'interêt?",
+
+    'date': "Date?",
+    'date format': "Formats acceptés:  'Lundi, Demain, 07/06...'",
+
+    'hour': "Heure?",
+    'hour format': "Formats acceptés:  '10h, 10:30; 10h30'",
+
+    'retry': "Reessayez",
+
+    'info to add': "Choisissez les champs à remplir"
 }
 
 

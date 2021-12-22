@@ -21,6 +21,7 @@ from Interests import Interests
 from Globals import Globals
 from Database import InterestDatabase
 from Localization import localize
+from user_search import *
 
 
 def fun_start(update: Update, context: CallbackContext) -> None | int:
@@ -96,7 +97,7 @@ def fun_ask_interests(update: Update, context: CallbackContext) -> int:
     interests = get_interests(update, context)
 
     reply_markup = Interests.build_reply_markup(interests,
-                                                add_end_button=[(localize('finish interests', 'fr'), "***END***")])
+                                                add_end_button=[(localize('finish', 'fr'), "***END***")])
 
     update.message.reply_text(localize('retrieve interests', get_lang(update)), reply_markup=reply_markup)
 
@@ -140,7 +141,7 @@ def fun_handle_interests(update: Update, context: CallbackContext) -> int:
         message_id=update.callback_query.message.message_id,
         inline_message_id=update.callback_query.inline_message_id,
         reply_markup=Interests.build_reply_markup(chosen_data,
-                                                  add_end_button=[(localize('finish interests', get_lang(update)),
+                                                  add_end_button=[(localize('finish', get_lang(update)),
                                                                    "***END***")]))
     return HANDLE_INTERESTS
 
@@ -196,7 +197,9 @@ def main():
             HANDLE_INTERESTS: [CallbackQueryHandler(fun_handle_interests)],
             FINISH_INIT: [MessageHandler(Filters.all, fun_finish_init)],
             NOMINAL: [MessageHandler(~Filters.command, fun_nominal)],
-            #HELP: [MessageHandler(~Filters.command, fun_help)],
+            SEARCH_CATEGORY: [CallbackQueryHandler(fun_handle_search)],
+            SEARCH_HANDLE_EVENT_BY_POI: [CallbackQueryHandler(fun_handle_search_event_by_poi)],
+            SEARCH_HANDLE_EVENT_BY_INTERESTS: [CallbackQueryHandler(fun_handle_search_event_by_interest)],
         },
         name="IsraEventList_bot",
         fallbacks=[
@@ -205,7 +208,8 @@ def main():
             CommandHandler('location', fun_ask_location),
             CommandHandler('commands', fun_commands),
             CommandHandler('contact', fun_contact),
-            CommandHandler('interests', fun_ask_interests)
+            CommandHandler('interests', fun_ask_interests),
+            CommandHandler('search', fun_search)
         ],
         persistent=True,
         allow_reentry=True

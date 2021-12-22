@@ -13,7 +13,7 @@ class Interests:
             add_begin_button: List[Tuple] | None = None,
             add_end_button: List[Tuple] | None = None,
             only_selected=False,
-
+            multi_select=True
     ) -> InlineKeyboardMarkup:
         interest_db = InterestDatabase()
         interests, parents = interest_db.get_all()
@@ -37,11 +37,14 @@ class Interests:
             else:
                 button2 = InlineKeyboardButton(Globals.EMOJI_WHITE_SQUARE, callback_data=interest_level1['id'])
 
-            button_list += [[button1, button2]]
+            if multi_select:
+                button_list += [[button1, button2]]
+            else:
+                button_list += [[button1]]
 
             if show_level2:
                 for interest_level2 in parents[interest_level1['id']]:
-                    button1 = InlineKeyboardButton("%s" % interest_level2['name'].ljust(max_len),
+                    button1 = InlineKeyboardButton("-- %s" % interest_level2['name'].ljust(max_len),
                                                    callback_data=interest_level2['id'])
 
                     if chosen_data is not None and str(interest_level2['id']) in chosen_data:
@@ -50,7 +53,10 @@ class Interests:
                     else:
                         button2 = InlineKeyboardButton(Globals.EMOJI_WHITE_SQUARE, callback_data=interest_level2['id'])
 
-                    button_list += [[button1, button2]]
+                    if multi_select:
+                        button_list += [[button1, button2]]
+                    else:
+                        button_list += [[button1]]
 
         if isinstance(add_end_button, list):
             button_list += [[InlineKeyboardButton(text, callback_data=key) for (text, key) in add_end_button]]

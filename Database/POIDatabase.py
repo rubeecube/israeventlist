@@ -1,6 +1,5 @@
 import sqlite3
 import Database
-from Unit import POI
 
 
 class POIDatabase(Database.DatabaseHelper):
@@ -11,21 +10,26 @@ class POIDatabase(Database.DatabaseHelper):
                id               INTEGER     PRIMARY KEY     AUTOINCREMENT,
                name             TEXT        NOT NULL,
                description      TEXT,
-               location         TEXT,
+               latitude         TEXT,
+               longitude        TEXT,
                address          TEXT,
                interest_id      INTEGER
             );
         '''
 
-    def get_all(self):
+    def get_all(self, interest_id=None):
         res = {}
-        query = self.cur.execute('''SELECT * FROM poi;''')
-        for (identity, name, description, location, address, interest_id) in query.fetchall():
+        if interest_id is None:
+            query = self.cur.execute('''SELECT * FROM poi;''')
+        else:
+            query = self.cur.execute('''SELECT * FROM poi WHERE interest_id = ?;''', (interest_id,))
+        for (identity, name, description, latitude, longitude, address, interest_id) in query.fetchall():
             res[identity] = {
                 "id": identity,
                 "name": name,
                 "description": description,
-                "location": location,
+                "latitude": latitude,
+                "longitude": longitude,
                 "address": address,
                 "interest_id": interest_id
             }
@@ -34,11 +38,28 @@ class POIDatabase(Database.DatabaseHelper):
 
         return res
 
-    def save(self, poi: POI):
+    def get_by_id(self, id):
+        res = {}
+        query = self.cur.execute('''SELECT * FROM poi WHERE id = ?;''', (id,))
+        for (identity, name, description, latitude, longitude, address, interest_id) in query.fetchall():
+            res[identity] = {
+                "id": identity,
+                "name": name,
+                "description": description,
+                "latitude": latitude,
+                "longitude": longitude,
+                "address": address,
+                "interest_id": interest_id
+            }
+        if len(res) == 0:
+            return None
+        return list(res.values())[0]
+
+    def save(self, poi):
         row = self.cur.execute('''INSERT INTO poi
-         (name, description, location, address, interest_id) VALUES
+         (name, description, latitude, longitude, address, interest_id) VALUES
          (?, ?, ?, ?, ?);''',
-         (poi.name, poi.description, poi.location, poi.address, poi.interest_id))
+         (poi.name, poi.description, poi.latitude, poi.longitude, poi.address, poi.interest_id))
 
         self.con.commit()
 

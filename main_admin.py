@@ -22,6 +22,7 @@ from Interests import Interests
 from Database.POIDatabase import POIDatabase
 from Database.InterestDatabase import InterestDatabase
 from Localization import localize
+from admin_add_event import *
 
 
 def funa_start(update: Update, context: CallbackContext) -> int:
@@ -39,7 +40,7 @@ def funa_commands(update: Update, context: CallbackContext) -> None | int:
 
 
 def funa_add(update: Update, context: CallbackContext) -> int:
-    list_add = ['poi', 'interest']
+    list_add = ['poi', 'interest', 'event']
     list_add = [(l, localize(l, get_lang(update))) for l in list_add]
 
     button_list = [[InlineKeyboardButton(text,  callback_data=key)] for (key, text) in list_add]
@@ -51,13 +52,16 @@ def funa_add(update: Update, context: CallbackContext) -> int:
 
 
 def funa_handle_add(update: Update, context: CallbackContext) -> int:
-    key = update.callback_query.data
+    key = get_callback_message(update)
 
     if key == 'poi':
         return funa_handle_add_poi(update, context)
 
     if key == 'interest':
         return funa_handle_add_interest(update, context)
+
+    if key == 'event':
+        return funa_handle_add_event(update, context)
 
 
 def funa_handle_add_interest(update: Update, context: CallbackContext) -> int:
@@ -173,7 +177,8 @@ def funa_handle_poi_add_desc(update: Update, context: CallbackContext) -> int:
 
 
 def funa_handle_poi_add_location(update: Update, context: CallbackContext) -> int:
-    context.chat_data['POI_ADD_location'] = str(update.effective_message.location)
+    context.chat_data['POI_ADD_latitude'] = str(update.effective_message.location.latitude)
+    context.chat_data['POI_ADD_longitude'] = str(update.effective_message.location.longitude)
 
     update.message.reply_text(localize('address of poi', get_lang(update)))
 
@@ -189,13 +194,15 @@ def funa_handle_poi_add_address(update: Update, context: CallbackContext) -> int
     poi.name = context.chat_data['POI_ADD_name']
     poi.description = context.chat_data['POI_ADD_description']
     poi.address = context.chat_data['POI_ADD_address']
-    poi.location = context.chat_data['POI_ADD_location']
+    poi.latitude = context.chat_data['POI_ADD_latitude']
+    poi.longitude = context.chat_data['POI_ADD_longitude']
     poi.interest_id = context.chat_data['POI_ADD_interest_id']
 
     context.chat_data.pop("POI_ADD_name")
     context.chat_data.pop("POI_ADD_description")
     context.chat_data.pop("POI_ADD_address")
-    context.chat_data.pop("POI_ADD_location")
+    context.chat_data.pop("POI_ADD_latitude")
+    context.chat_data.pop("POI_ADD_longitude")
     context.chat_data.pop("POI_ADD_interest_id")
 
     poi_database = POIDatabase()
@@ -236,6 +243,15 @@ def main():
             POI_ADD_LOCATION: [MessageHandler(Filters.location & ~Filters.command & filter_admin, funa_handle_poi_add_location)],
             INTEREST_ADD_PARENT: [CallbackQueryHandler(funa_handle_interest_add_parent)],
             INTEREST_ADD_NAME: [MessageHandler(Filters.text & ~Filters.command & filter_admin, funa_interest_add_name)],
+
+            EVENT_ADD_HANDLE_CHOICE: [CallbackQueryHandler(funa_handle_add_event_choice)],
+            EVENT_ADD_NAME: [MessageHandler(Filters.text & ~Filters.command & filter_admin, funa_event_add_name)],
+            EVENT_ADD_DESC: [MessageHandler(Filters.text & ~Filters.command & filter_admin, funa_event_add_desc)],
+            EVENT_ADD_DATE: [MessageHandler(Filters.text & ~Filters.command & filter_admin, funa_event_add_date)],
+            EVENT_ADD_TIME: [MessageHandler(Filters.text & ~Filters.command & filter_admin, funa_event_add_time)],
+            EVENT_ADD_HANDLE_RECURRENCE: [CallbackQueryHandler(funa_handle_add_handle_recurrence)],
+            EVENT_ADD_INTEREST: [CallbackQueryHandler(funa_handle_event_add_interest)],
+            EVENT_ADD_POI: [CallbackQueryHandler(funa_handle_event_add_poi)],
         },
         name="IsraEventListAdmin_bot",
         fallbacks=[
