@@ -1,6 +1,4 @@
-import sqlite3
 import Database
-from Unit import Interest
 
 
 class InterestDatabase(Database.DatabaseHelper):
@@ -14,10 +12,15 @@ class InterestDatabase(Database.DatabaseHelper):
                type_interest    TEXT
             );'''
 
-    def get_all(self):
+    def get(self, element_id=None, return_parents=True):
         res = {}
         parents = {}
-        query = self.cur.execute('''SELECT * FROM interests;''')
+
+        if element_id is None:
+            query = self.cur.execute('SELECT * FROM interests;')
+        else:
+            query = self.cur.execute('SELECT * FROM interests WHERE id = ?;', (element_id,))
+
         for (identity, name, id_parent, type_interest) in query.fetchall():
             res[identity] = {
                 "id": identity,
@@ -35,16 +38,20 @@ class InterestDatabase(Database.DatabaseHelper):
                     "type_interest": type_interest
                 }]
 
-        InterestDatabase.TEMP_DB = res, parents
+        if len(res) == 0 and element_id is not None:
+            return list(res.values())[0]
+        if return_parents:
+            return res, parents
+        return res
 
-        return res, parents
-
-    def save(self, interest: Interest):
-        row = self.cur.execute('''INSERT INTO interests
-         (name, id_parent, type_interest) VALUES
-         (?, ?, ?);''',
-         (interest.name, interest.id_parent, interest.type_interest))
+    def save(self, interest):
+        row = self.cur.execute(
+            'INSERT INTO interests'
+            ' (name, id_parent, type_interest)'
+            ' VALUES (?, ?, ?);',
+            (interest.name, interest.id_parent, interest.type_interest)
+        )
 
         self.con.commit()
 
-        return interest
+        return row

@@ -1,14 +1,9 @@
-from Localization import localize
-from telegram import Update
-from telegram.ext import CallbackContext
-from internals import *
 from internals_admin import *
 from Globals import Globals
 from StateManagement_admin import *
 import dateparser
 from dateutil import parser
-from Interests import Interests
-from POIs import POIs
+from ReplyMarkupHelper import ReplyMarkupHelper
 from Database.InterestDatabase import InterestDatabase
 from Database.POIDatabase import POIDatabase
 from Database.EventDatabase import EventDatabase
@@ -39,20 +34,20 @@ def event_days(update):
 def funa_handle_add_event(update: Update, context: CallbackContext) -> int:
     data = event_categories(update)
 
-    reply_markup = Globals.build_reply_markup_multiselect(
+    reply_markup = ReplyMarkupHelper.generic_build_reply_markup(
         data,
         add_end_button=[(localize('finish', get_lang(update)), "***END***")]
     )
 
-    send_message_callback('info to add', update, context, reply_markup=reply_markup)
+    send_message('info to add', update, context, reply_markup=reply_markup)
 
     return EVENT_ADD_HANDLE_CHOICE
 
 
 def funa_handle_add_event_choice(update: Update, context: CallbackContext) -> int | None:
     chosen_data = []
-    message = update.callback_query.message
-    choice = get_callback_message(update)
+    message = get_message(update)
+    choice = get_message_text(update)
 
     for inlinekb in message['reply_markup']['inline_keyboard']:
         if len(inlinekb) > 1 and inlinekb[1]['text'] == Globals.EMOJI_CHECKED:
@@ -61,14 +56,14 @@ def funa_handle_add_event_choice(update: Update, context: CallbackContext) -> in
     data = event_categories(update)
 
     if choice == "***END***":
-        selected = Globals.build_reply_markup_multiselect(
+        selected = ReplyMarkupHelper.generic_build_reply_markup(
             data,
             chosen_data=chosen_data,
             return_selected=True
         )
         context.chat_data['EVENT'] = {'optional': selected}
 
-        send_message_callback('name of event', update, context)
+        send_message('name of event', update, context)
 
         return EVENT_ADD_NAME
 
@@ -77,7 +72,7 @@ def funa_handle_add_event_choice(update: Update, context: CallbackContext) -> in
     else:
         chosen_data += [choice]
 
-    reply_markup = Globals.build_reply_markup_multiselect(
+    reply_markup = ReplyMarkupHelper.generic_build_reply_markup(
         data,
         chosen_data=chosen_data,
         add_end_button=[(localize('finish', get_lang(update)), "***END***")]
@@ -89,36 +84,36 @@ def funa_handle_add_event_choice(update: Update, context: CallbackContext) -> in
 
 
 def funa_event_add_name(update: Update, context: CallbackContext) -> int:
-    message = get_message(update)
+    message = get_message_text(update)
 
     context.chat_data['EVENT']['name'] = message
 
     if localize('description', get_lang(update)) in context.chat_data['EVENT']['optional']:
-        send_message('desc of event', update)
+        send_message('desc of event', update, context)
 
         return EVENT_ADD_DESC
     else:
         context.chat_data['EVENT']['description'] = None
 
-        send_message('date', update)
-        send_message('date format', update)
+        send_message('date', update, context)
+        send_message('date format', update, context)
 
         return EVENT_ADD_DATE
 
 
 def funa_event_add_desc(update: Update, context: CallbackContext) -> int:
-    message = get_message(update)
+    message = get_message_text(update)
 
     context.chat_data['EVENT']['desc'] = message
 
-    send_message('date', update)
-    send_message('date format', update)
+    send_message('date', update, context)
+    send_message('date format', update, context)
 
     return EVENT_ADD_DATE
 
 
 def funa_event_add_date(update: Update, context: CallbackContext) -> int | None:
-    date = get_message(update)
+    date = get_message_text(update)
 
     try:
         context.chat_data['EVENT']['date_event'] = dateparser.parse(date).date()
@@ -126,19 +121,19 @@ def funa_event_add_date(update: Update, context: CallbackContext) -> int | None:
         if 'date_error' in list(context.chat_data['EVENT'].keys()):
             context.chat_data['EVENT']['date_error'] += 1
             if context.chat_data['EVENT']['date_error'] >= 3:
-                send_message('error', update)
+                send_message('error', update, context)
                 context.chat_data.pop('EVENT')
                 return AUTHENTICATED
         else:
             context.chat_data['EVENT']['date_error'] = 1
-        send_message('retry', update)
-        send_message('date', update)
-        send_message('date format', update)
+        send_message('retry', update, context)
+        send_message('date', update, context)
+        send_message('date format', update, context)
         return
 
     if localize('time', get_lang(update)) in context.chat_data['EVENT']['optional']:
-        send_message('hour', update)
-        send_message('hour format', update)
+        send_message('hour', update, context)
+        send_message('hour format', update, context)
 
         return EVENT_ADD_TIME
     else:
@@ -147,26 +142,24 @@ def funa_event_add_date(update: Update, context: CallbackContext) -> int | None:
         if localize('recurrence', get_lang(update)) in context.chat_data['EVENT']['optional']:
             data = event_days(update)
 
-            reply_markup = Globals.build_reply_markup_multiselect(
+            reply_markup = ReplyMarkupHelper.generic_build_reply_markup(
                 data,
                 add_end_button=[(localize('finish', get_lang(update)), "***END***")]
             )
 
-            send_message('recurrence', update, reply_markup=reply_markup)
+            send_message('recurrence', update, context, reply_markup=reply_markup)
 
             return EVENT_ADD_HANDLE_RECURRENCE
         else:
-            reply_markup = Interests.build_reply_markup(show_level2=True)
+            reply_markup = ReplyMarkupHelper.interests_build_reply_markup(show_level2=True)
 
-            send_message('interest for add',
-                         update,
-                         reply_markup=reply_markup)
+            send_message('interest for add', update, context, reply_markup=reply_markup)
 
             return EVENT_ADD_INTEREST
 
 
 def funa_event_add_time(update: Update, context: CallbackContext) -> int | None:
-    hour = get_message(update)
+    hour = get_message_text(update)
 
     try:
         context.chat_data['EVENT']['time_event'] = parser.parse(hour).time()
@@ -174,35 +167,33 @@ def funa_event_add_time(update: Update, context: CallbackContext) -> int | None:
         if 'time_error' in list(context.chat_data['EVENT'].keys()):
             context.chat_data['EVENT']['time_error'] += 1
             if context.chat_data['EVENT']['time_error'] >= 3:
-                send_message('error', update)
+                send_message('error', update, context)
                 context.chat_data.pop('EVENT')
                 return AUTHENTICATED
         else:
             context.chat_data['EVENT']['time_error'] = 1
-        send_message('retry', update)
-        send_message('hour', update)
-        send_message('hour format', update)
+        send_message('retry', update, context)
+        send_message('hour', update, context)
+        send_message('hour format', update, context)
         return
 
     if localize('recurrence', get_lang(update)) in context.chat_data['EVENT']['optional']:
         data = event_days(update)
 
-        reply_markup = Globals.build_reply_markup_multiselect(
+        reply_markup = ReplyMarkupHelper.generic_build_reply_markup(
             data,
             add_end_button=[(localize('finish', get_lang(update)), "***END***")]
         )
 
-        send_message('recurrence', update, reply_markup=reply_markup)
+        send_message('recurrence', update, context, reply_markup=reply_markup)
 
         return EVENT_ADD_HANDLE_RECURRENCE
     else:
         context.chat_data['EVENT']['recurrence'] = None
 
-        reply_markup = Interests.build_reply_markup(show_level2=True)
+        reply_markup = ReplyMarkupHelper.interests_build_reply_markup(show_level2=True)
 
-        send_message('interest for add',
-                     update,
-                     reply_markup=reply_markup)
+        send_message('interest for add', update, context, reply_markup=reply_markup)
 
         return EVENT_ADD_INTEREST
 
@@ -210,7 +201,7 @@ def funa_event_add_time(update: Update, context: CallbackContext) -> int | None:
 def funa_handle_add_handle_recurrence(update: Update, context: CallbackContext) -> int | None:
     chosen_data = []
     message = update.callback_query.message
-    choice = get_callback_message(update)
+    choice = get_message_text(update)
 
     for inlinekb in message['reply_markup']['inline_keyboard']:
         if len(inlinekb) > 1 and inlinekb[1]['text'] == Globals.EMOJI_CHECKED:
@@ -219,19 +210,16 @@ def funa_handle_add_handle_recurrence(update: Update, context: CallbackContext) 
     data = event_days(update)
 
     if choice == "***END***":
-        selected = Globals.build_reply_markup_multiselect(
+        selected = ReplyMarkupHelper.generic_build_reply_markup(
             data,
             chosen_data=chosen_data,
             return_selected=True
         )
         context.chat_data['EVENT']['recurrence'] = selected
 
-        reply_markup = Interests.build_reply_markup(show_level2=True)
+        reply_markup = ReplyMarkupHelper.interests_build_reply_markup(show_level2=True)
 
-        send_message_callback('interest for add',
-                     update,
-                     context,
-                     reply_markup=reply_markup)
+        send_message('interest for add', update, context, reply_markup=reply_markup)
 
         return EVENT_ADD_INTEREST
 
@@ -240,7 +228,7 @@ def funa_handle_add_handle_recurrence(update: Update, context: CallbackContext) 
     else:
         chosen_data += [choice]
 
-    reply_markup = Globals.build_reply_markup_multiselect(
+    reply_markup = ReplyMarkupHelper.generic_build_reply_markup(
         data,
         chosen_data=chosen_data,
         add_end_button=[(localize('finish', get_lang(update)), "***END***")]
@@ -252,39 +240,36 @@ def funa_handle_add_handle_recurrence(update: Update, context: CallbackContext) 
 
 
 def funa_handle_event_add_interest(update: Update, context: CallbackContext) -> int:
-    interest_id = get_callback_message(update)
+    interest_id = get_message_text(update)
 
     interest_db = InterestDatabase()
-    interests, parents = interest_db.get_all()
+    interests, parents = interest_db.get()
 
     if int(interest_id) not in interests.keys():
-        send_message_callback('error', update, context)
+        send_message('error', update, context)
         return AUTHENTICATED
 
     context.chat_data['EVENT']['interest_id'] = interest_id
 
-    reply_markup = Interests.build_reply_markup(show_level2=True, only_selected=True)
+    reply_markup = ReplyMarkupHelper.interests_build_reply_markup(show_level2=True, only_selected=True)
 
     edit_message('saved', update, context, reply_markup=reply_markup)
 
-    reply_markup = POIs.build_reply_markup(interest_id=interest_id)
+    reply_markup = ReplyMarkupHelper.poi_build_reply_markup(interest_id=interest_id)
 
-    send_message_callback('poi for add',
-                          update,
-                          context,
-                          reply_markup=reply_markup)
+    send_message('poi for add', update, context, reply_markup=reply_markup)
 
     return EVENT_ADD_POI
 
 
 def funa_handle_event_add_poi(update: Update, context: CallbackContext) -> int:
-    poi_id = get_callback_message(update)
+    poi_id = get_message_text(update)
 
     poi_db = POIDatabase()
-    pois = poi_db.get_all()
+    pois = poi_db.get()
 
     if int(poi_id) not in pois.keys():
-        send_message_callback('error', update, context)
+        send_message('error', update, context)
         return AUTHENTICATED
 
     context.chat_data['EVENT']['poi_id'] = poi_id

@@ -1,11 +1,15 @@
-import json
-
 from Localization import localize
-from babel.dates import format_date, format_datetime, format_time
+from babel.dates import format_date, format_time
 
+from Database import DatabaseHelper
+from Database.EventDatabase import EventDatabase
 from Database.POIDatabase import POIDatabase
+from Database.UserDatabase import UserDatabase
+from Database.InterestDatabase import InterestDatabase
+
 
 class Unit:
+    database_class = DatabaseHelper
     attr = None
 
     def __init__(self):
@@ -27,12 +31,15 @@ class Unit:
     def to_str(self, lang, inline=False):
         return str(self)
 
-    @staticmethod
-    def id_to_str(id, lang, inline=False):
-        raise NotImplementedError
+    @classmethod
+    def id_to_str(cls, element_id, lang, inline=False):
+        database = cls.database_class()
+        element = database.get(element_id=element_id)
+        return cls.dict_to_str(element, lang, inline)
 
 
 class Event (Unit):
+    database_class = EventDatabase
     attr = ['name', 'description', 'interest_id', 'poi_id', 'date_event', 'time_event', 'recurrence']
 
     @staticmethod
@@ -76,6 +83,7 @@ class Event (Unit):
 
 
 class POI (Unit):
+    database_class = POIDatabase
     attr = ['name', 'description', 'latitude', 'longitude', 'address', 'interest_id']
 
     @staticmethod
@@ -99,16 +107,12 @@ class POI (Unit):
         s += self.address
         return s
 
-    @staticmethod
-    def id_to_str(id, lang, inline=False):
-        poi_database = POIDatabase()
-        poi = poi_database.get_by_id(id)
-        return POI.dict_to_str(poi, lang, inline)
-
 
 class User(Unit):
+    database_class = UserDatabase
     attr = ['telegram_id', 'phone', 'location', 'user_data', 'interests', 'misc']
 
 
 class Interest(Unit):
+    database_class = InterestDatabase
     attr = ['name', 'id_parent', 'type_interest']

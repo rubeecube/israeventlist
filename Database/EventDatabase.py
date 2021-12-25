@@ -1,9 +1,8 @@
-import datetime
-import sqlite3
-import Database
-from Unit import Event
-from dateutil import parser
 import json
+
+from dateutil import parser
+
+import Database
 
 
 class EventDatabase(Database.DatabaseHelper):
@@ -22,16 +21,25 @@ class EventDatabase(Database.DatabaseHelper):
             );
         '''
 
-    def get_all(self, interest_id=None, poi_id=None):
+    def get(self, element_id=None, interest_id=None, poi_id=None):
         res = {}
-        if interest_id is None and poi_id is None:
-            query = self.cur.execute('''SELECT * FROM event;''')
-        elif interest_id is None:
-            query = self.cur.execute('''SELECT * FROM event WHERE poi_id = ?;''', (poi_id,))
-        elif poi_id is None:
-            query = self.cur.execute('''SELECT * FROM event WHERE interest_id = ?;''', (interest_id,))
+        if element_id is None and interest_id is None and poi_id is None:
+            query = self.cur.execute('SELECT * FROM event;')
         else:
-            query = self.cur.execute('''SELECT * FROM event WHERE interest_id = ? AND poi_id = ?;''', (interest_id, poi_id))
+            query_l = []
+            query_t = ()
+            if element_id is not None:
+                query_l += ['element_id = ?']
+                query_t += (element_id,)
+            if interest_id is not None:
+                query_l += ['interest_id = ?']
+                query_t += (interest_id,)
+            if poi_id is not None:
+                query_l += ['poi_id = ?']
+                query_t += (poi_id,)
+
+            query = self.cur.execute('SELECT * FROM event WHERE ' + ' AND '.join(query_l), query_t)
+
         for (identity, name, description, interest_id, poi_id, date_event, time_event, recurrence) in query.fetchall():
             res[identity] = {
                 "id": identity,
@@ -44,15 +52,19 @@ class EventDatabase(Database.DatabaseHelper):
                 "recurrence": json.loads(recurrence)
             }
 
+        if len(res) == 0 and element_id is not None:
+            return list(res.values())[0]
         return res
 
-    def save(self, event: Event):
-        row = self.cur.execute('''INSERT INTO event
-         (name, description, interest_id, poi_id, date_event, time_event, recurrence) VALUES
-         (?, ?, ?, ?, ?, ?, ?);''',
-         (event.name, event.description, event.interest_id, event.poi_id, event.date_event, event.time_event, event.recurrence))
+    def save(self, event):
+        row = self.cur.execute(
+            'INSERT INTO event'
+            ' (name, description, interest_id, poi_id, date_event, time_event, recurrence)'
+            ' VALUES (?, ?, ?, ?, ?, ?, ?);',
+            (event.name, event.description, event.interest_id, event.poi_id, event.date_event, event.time_event,
+             event.recurrence)
+        )
 
         self.con.commit()
 
-        return event
-
+        return row

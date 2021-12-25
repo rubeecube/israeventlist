@@ -1,4 +1,4 @@
-from telegram import Update, KeyboardButton, ReplyKeyboardMarkup
+from telegram import Update, KeyboardButton, ReplyKeyboardMarkup, InlineKeyboardMarkup
 from telegram.ext import CallbackContext
 from Unit import User
 from Database.UserDatabase import UserDatabase
@@ -128,37 +128,50 @@ def unsubscribe_all(update: Update, context: CallbackContext) -> None:
     return
 
 
-def get_callback_message(update: Update):
-    return update.callback_query.data
+def get_message_text(update: Update):
+    if update.message is not None:
+        return update.message.text
+
+    if update.callback_query is not None:
+        return update.callback_query.data
 
 
 def get_message(update: Update):
-    return update.message.text
+    if update.message is not None:
+        return update.message
+
+    if update.callback_query is not None:
+        return update.callback_query.message
 
 
-def edit_message(message, update: Update, context: CallbackContext, reply_markup=None, local=True):
+def edit_message(message, update: Update, context: CallbackContext, reply_markup: InlineKeyboardMarkup = None,
+                 local: bool = True):
     if local:
         message = localize(message, get_lang(update))
-    context.bot.edit_message_text(text=message,
-                                  chat_id=update.callback_query.message.chat_id,
-                                  message_id=update.callback_query.message.message_id,
-                                  inline_message_id=update.callback_query.inline_message_id,
-                                  reply_markup=reply_markup)
+
+    if update.message is not None:
+        context.bot.edit_message_text(text=message,
+                                      chat_id=update.message.chat_id,
+                                      message_id=update.message.message_id,
+                                      reply_markup=reply_markup)
+
+    if update.callback_query is not None:
+        context.bot.edit_message_text(text=message,
+                                      inline_message_id=update.callback_query.inline_message_id,
+                                      reply_markup=reply_markup)
 
 
-def send_message_callback(message, update: Update, context: CallbackContext, reply_markup=None, local=True):
+def send_message(message, update: Update,
+                 context: CallbackContext,
+                 reply_markup: InlineKeyboardMarkup | ReplyKeyboardMarkup = None,
+                 local: bool = True):
     if local:
         message = localize(message, get_lang(update))
-    context.bot.send_message(text=message,
-                             chat_id=update.callback_query.message.chat_id,
-                             reply_markup=reply_markup)
 
+    if update.message is not None:
+        update.message.reply_text(text=message, reply_markup=reply_markup)
 
-def send_message(message, update: Update, reply_markup=None, local=True):
-    if local:
-        message = localize(message, get_lang(update))
-    update.message.reply_text(text=message, reply_markup=reply_markup)
-
-
+    if update.callback_query is not None:
+        context.bot.send_message(text=message, chat_id=update.callback_query.message.chat_id, reply_markup=reply_markup)
 
 

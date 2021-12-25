@@ -22,7 +22,7 @@ dic = {
     'thanks location': "Merci d'avoir partagé votre localisation.",
     'thanks interests': "Merci d'avoir partagé vos centres d'interêts.",
     'retrieve interests': "Choisissez un ou plusieurs centre d'interêt.",
-    'finish': "J'ai terminé %s" % (Globals.EMOJI_THUMBS_UP),
+    'finish': "J'ai terminé %s" % Globals.EMOJI_THUMBS_UP,
     "contact us": "Vous pouvez envoyer vos suggestions directement à tout moment.",
     "command list": "Veuillez choisir:",
 

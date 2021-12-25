@@ -83,7 +83,7 @@ class DatabaseHelper:
         self.post_initialize()
 
     def initialize(self):
-        raise NotImplemented
+        raise NotImplementedError
 
     def post_initialize(self):
         try:
@@ -94,3 +94,6 @@ class DatabaseHelper:
                 self.con.commit()
             except sqlite3.OperationalError:
                 pass
+
+    def get(self, **kwargs):
+        raise NotImplementedError

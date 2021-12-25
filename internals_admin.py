@@ -1,11 +1,3 @@
-from telegram import Update, KeyboardButton, ReplyKeyboardMarkup
-from telegram.ext import (
-    CallbackContext,
-
-)
-from Unit import User
-from Database.UserDatabase import UserDatabase
-from Localization import localize
 from internals import *
 
 

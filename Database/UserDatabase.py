@@ -1,7 +1,6 @@
 import json
 import sqlite3
 import Database
-from Unit import User
 
 
 class UserDatabase(Database.DatabaseHelper):
@@ -18,7 +17,7 @@ class UserDatabase(Database.DatabaseHelper):
                telegram_id      TEXT        UNIQUE
             );'''
 
-    def save(self, user: User):
+    def save(self, user):
         user_data = None
         misc = None
         interests = None
@@ -31,15 +30,21 @@ class UserDatabase(Database.DatabaseHelper):
             interests = json.dumps(user.interests)
 
         try:
-            row = self.cur.execute('''INSERT INTO users
-             (user_data, misc, interests, phone, location, telegram_id) VALUES
-             (?, ?, ?, ?, ?, ?);''',
-             (user_data, misc, interests, user.phone, user.location, user.telegram_id))
+            row = self.cur.execute(
+                'INSERT INTO  %s' 
+                ' (user_data, misc, interests, phone, location, telegram_id)'
+                ' VALUES (?, ?, ?, ?, ?, ?);' % self.table_name,
+                (user_data, misc, interests, user.phone, user.location, user.telegram_id)
+            )
 
         except sqlite3.IntegrityError:
-            row = self.cur.execute('''UPDATE users SET user_data = ?, misc = ?, interests = ?, phone = ?,
-             location = ? WHERE telegram_id = ?;''',
-                    (user_data, misc, interests, user.phone, user.location, user.telegram_id))
+            row = self.cur.execute(
+                'UPDATE %s'
+                ' SET'
+                ' user_data = ?, misc = ?, interests = ?, phone = ?, location = ?'
+                ' WHERE telegram_id = ?;' % self.table_name,
+                (user_data, misc, interests, user.phone, user.location, user.telegram_id)
+            )
 
         self.con.commit()
 
@@ -48,8 +53,9 @@ class UserDatabase(Database.DatabaseHelper):
         else:
             return None
 
-    def get(self, telegram_id):
-        rows = self.cur.execute("SELECT * FROM users WHERE telegram_id = ?;", (str(telegram_id), ))
+    def get(self, telegram_id=None):
+        from Unit import User
+        rows = self.cur.execute("SELECT * FROM %s WHERE telegram_id = ?;" % self.table_name, (str(telegram_id), ))
 
         row = rows.fetchone()
 
@@ -75,5 +81,3 @@ class UserDatabase(Database.DatabaseHelper):
             user.telegram_id = telegram_id
 
         return user
-
-
