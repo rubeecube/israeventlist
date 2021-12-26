@@ -49,6 +49,8 @@ def funa_handle_add_event_choice(update: Update, context: CallbackContext) -> in
     message = get_message(update)
     choice = get_message_text(update)
 
+
+
     for inlinekb in message['reply_markup']['inline_keyboard']:
         if len(inlinekb) > 1 and inlinekb[1]['text'] == Globals.EMOJI_CHECKED:
             chosen_data += [inlinekb[1]['callback_data']]

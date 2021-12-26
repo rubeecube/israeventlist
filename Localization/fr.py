@@ -29,7 +29,7 @@ dic = {
     "command interests": "Choisir ou éditer mes interêts.",
     "command phone": "Partager mon numéro de téléphone.",
     "command location": "Partager ma localisation.",
-    "command commands": "Voir la liste des commmandes.",
+    "command commands": "Voir la liste des commandes.",
     "command contact": "Contactez nous.",
     "command stop": "Arrêter le service.",
     "command search": "Recherche.",

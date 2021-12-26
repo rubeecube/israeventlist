@@ -6,10 +6,17 @@ from Localization import localize
 
 
 def get_lang(update: Update):
-    if update.effective_message.from_user.language_code is not None:
+    try:
         return update.effective_message.from_user.language_code
-    if update.callback_query.from_user.language_code is not None:
+    except AttributeError:
+        pass
+
+    try:
         return update.callback_query.from_user.language_code
+    except AttributeError:
+        pass
+
+    return None
 
 
 def initialize(update: Update, context: CallbackContext) -> None:
@@ -157,6 +164,8 @@ def edit_message(message, update: Update, context: CallbackContext, reply_markup
 
     if update.callback_query is not None:
         context.bot.edit_message_text(text=message,
+                                      chat_id=update.callback_query.message.chat_id,
+                                      message_id=update.callback_query.message.message_id,
                                       inline_message_id=update.callback_query.inline_message_id,
                                       reply_markup=reply_markup)
 
