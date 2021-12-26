@@ -24,7 +24,7 @@ class POIDatabase(Database.DatabaseHelper):
             query_l = []
             query_t = ()
             if element_id is not None:
-                query_l += ['element_id = ?']
+                query_l += ['id = ?']
                 query_t += (element_id,)
             if interest_id is not None:
                 query_l += ['interest_id = ?']
@@ -43,7 +43,7 @@ class POIDatabase(Database.DatabaseHelper):
                 "interest_id": interest_id
             }
 
-        if len(res) == 0 and element_id is not None:
+        if len(res) == 1 and element_id is not None:
             return list(res.values())[0]
         return res
 

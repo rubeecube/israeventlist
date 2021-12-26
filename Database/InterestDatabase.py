@@ -38,7 +38,7 @@ class InterestDatabase(Database.DatabaseHelper):
                     "type_interest": type_interest
                 }]
 
-        if len(res) == 0 and element_id is not None:
+        if len(res) == 1 and element_id is not None:
             return list(res.values())[0]
         if return_parents:
             return res, parents
