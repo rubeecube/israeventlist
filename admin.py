@@ -118,8 +118,9 @@ def main():
 
     updater.start_polling()
 
-    updater.idle()
+    return updater
 
 
 if __name__ == '__main__':
-    main()
+    updater = main()
+    updater.idle()

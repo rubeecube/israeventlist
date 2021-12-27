@@ -3,7 +3,7 @@ from internals import *
 
 def get_raw_commands_admin(lang="fr"):
     commands = []
-    for command in ["add", "push", "commands"]:
+    for command in ["add", "commands"]:
         commands += [
             ("/%s" % command, "%s" % localize("command_admin %s" % command, lang)),
         ]
