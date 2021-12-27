@@ -3,6 +3,7 @@ from telegram.ext import CallbackContext
 from Unit import User
 from Database.UserDatabase import UserDatabase
 from Localization import localize
+from typing import List
 
 
 def get_lang(update: Update):
@@ -91,7 +92,7 @@ def save_interests(update: Update, context: CallbackContext, interests) -> None:
     return
 
 
-def get_interests(update: Update, context: CallbackContext) -> None | list:
+def get_interests(update: Update, context: CallbackContext) -> None | List:
     user_database = UserDatabase()
 
     user = user_database.get(update.effective_user.id)
