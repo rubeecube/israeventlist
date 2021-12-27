@@ -1,5 +1,5 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-from typing import List, Tuple, Optional
+from typing import List, Tuple, Optional, Union
 from Globals import Globals
 from Database.EventDatabase import EventDatabase
 from Database.InterestDatabase import InterestDatabase
@@ -166,7 +166,7 @@ class ReplyMarkupHelper:
             only_selected=False,
             return_selected=False,
             multi_select=True
-    ) -> InlineKeyboardMarkup | List:
+    ) -> Union[InlineKeyboardMarkup, List]:
 
         button_list = []
         button_selected = []

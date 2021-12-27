@@ -117,7 +117,7 @@ def funa_event_add_date(update: Update, context: CallbackContext) -> Optional[in
 
     try:
         context.chat_data['EVENT']['date_event'] = dateparser.parse(date).date()
-    except TypeError | ValueError:
+    except (TypeError, ValueError):
         if 'date_error' in list(context.chat_data['EVENT'].keys()):
             context.chat_data['EVENT']['date_error'] += 1
             if context.chat_data['EVENT']['date_error'] >= 3:

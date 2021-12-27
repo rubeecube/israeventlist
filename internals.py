@@ -3,7 +3,7 @@ from telegram.ext import CallbackContext
 from Unit import User
 from Database.UserDatabase import UserDatabase
 from Localization import localize
-from typing import List, Optional
+from typing import List, Optional, Union
 
 
 def get_lang(update: Update):
@@ -173,7 +173,7 @@ def edit_message(message, update: Update, context: CallbackContext, reply_markup
 
 def send_message(message, update: Update,
                  context: CallbackContext,
-                 reply_markup: InlineKeyboardMarkup | ReplyKeyboardMarkup = None,
+                 reply_markup: Union[InlineKeyboardMarkup, ReplyKeyboardMarkup] = None,
                  local: bool = True):
     if local:
         message = localize(message, get_lang(update))
