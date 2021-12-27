@@ -1,5 +1,5 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 from Globals import Globals
 from Database.EventDatabase import EventDatabase
 from Database.InterestDatabase import InterestDatabase
@@ -10,8 +10,8 @@ class ReplyMarkupHelper:
     @staticmethod
     def event_build_reply_markup(
             chosen_data=None,
-            add_begin_button: List[Tuple] | None = None,
-            add_end_button: List[Tuple] | None = None,
+            add_begin_button: Optional[List[Tuple]] = None,
+            add_end_button: Optional[List[Tuple]] = None,
             only_selected=False,
             interest_id=None,
             poi_id=None,
@@ -56,8 +56,8 @@ class ReplyMarkupHelper:
     def interests_build_reply_markup(
             chosen_data=None,
             show_level2=False,
-            add_begin_button: List[Tuple] | None = None,
-            add_end_button: List[Tuple] | None = None,
+            add_begin_button: Optional[List[Tuple]] = None,
+            add_end_button: Optional[List[Tuple]] = None,
             only_selected=False,
             multi_select=True
     ) -> InlineKeyboardMarkup:
@@ -117,8 +117,8 @@ class ReplyMarkupHelper:
     @staticmethod
     def poi_build_reply_markup(
             chosen_data=None,
-            add_begin_button: List[Tuple] | None = None,
-            add_end_button: List[Tuple] | None = None,
+            add_begin_button: Optional[List[Tuple]] = None,
+            add_end_button: Optional[List[Tuple]] = None,
             only_selected=False,
             interest_id=None,
             multi_select=True
@@ -162,7 +162,7 @@ class ReplyMarkupHelper:
     def generic_build_reply_markup(
             data=None,
             chosen_data=None,
-            add_end_button: List[Tuple] | None = None,
+            add_end_button: Optional[List[Tuple]] = None,
             only_selected=False,
             return_selected=False,
             multi_select=True

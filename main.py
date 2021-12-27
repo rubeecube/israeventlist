@@ -9,6 +9,8 @@ from telegram.ext import (
     PicklePersistence,
 )
 
+from typing import Optional
+
 from Storage.config import TOKEN
 
 from user_search import *
@@ -17,7 +19,7 @@ from user_interests import *
 from user_phone import *
 
 
-def fun_start(update: Update, context: CallbackContext) -> None | int:
+def fun_start(update: Update, context: CallbackContext) -> Optional[int]:
     initialize(update, context)
 
     send_message("welcome text", update, context)
@@ -25,7 +27,7 @@ def fun_start(update: Update, context: CallbackContext) -> None | int:
     return fun_commands(update, context)
 
 
-def fun_commands(update: Update, context: CallbackContext) -> None | int:
+def fun_commands(update: Update, context: CallbackContext) -> Optional[int]:
     reply = get_commands(get_lang(update), exclude=["/stop"])
 
     send_message("command list", update, context, reply_markup=reply)

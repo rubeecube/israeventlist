@@ -9,6 +9,8 @@ from telegram.ext import (
     PicklePersistence
 )
 
+from typing import Optional
+
 from Storage.config import TOKEN, ADMINS
 
 from admin_add_event import *
@@ -22,7 +24,7 @@ def funa_start(update: Update, context: CallbackContext) -> int:
     return AUTHENTICATED
 
 
-def funa_commands(update: Update, context: CallbackContext) -> None | int:
+def funa_commands(update: Update, context: CallbackContext) -> Optional[int]:
     reply = get_commands_admin(get_lang(update), exclude=["/stop"])
 
     send_message("command_admin list", update, context, reply_markup=reply)

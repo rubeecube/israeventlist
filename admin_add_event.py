@@ -44,12 +44,10 @@ def funa_handle_add_event(update: Update, context: CallbackContext) -> int:
     return EVENT_ADD_HANDLE_CHOICE
 
 
-def funa_handle_add_event_choice(update: Update, context: CallbackContext) -> int | None:
+def funa_handle_add_event_choice(update: Update, context: CallbackContext) -> Optional[int]:
     chosen_data = []
     message = get_message(update)
     choice = get_message_text(update)
-
-
 
     for inlinekb in message['reply_markup']['inline_keyboard']:
         if len(inlinekb) > 1 and inlinekb[1]['text'] == Globals.EMOJI_CHECKED:
@@ -114,7 +112,7 @@ def funa_event_add_desc(update: Update, context: CallbackContext) -> int:
     return EVENT_ADD_DATE
 
 
-def funa_event_add_date(update: Update, context: CallbackContext) -> int | None:
+def funa_event_add_date(update: Update, context: CallbackContext) -> Optional[int]:
     date = get_message_text(update)
 
     try:
@@ -160,7 +158,7 @@ def funa_event_add_date(update: Update, context: CallbackContext) -> int | None:
             return EVENT_ADD_INTEREST
 
 
-def funa_event_add_time(update: Update, context: CallbackContext) -> int | None:
+def funa_event_add_time(update: Update, context: CallbackContext) -> Optional[int]:
     hour = get_message_text(update)
 
     try:
@@ -200,7 +198,7 @@ def funa_event_add_time(update: Update, context: CallbackContext) -> int | None:
         return EVENT_ADD_INTEREST
 
 
-def funa_handle_add_handle_recurrence(update: Update, context: CallbackContext) -> int | None:
+def funa_handle_add_handle_recurrence(update: Update, context: CallbackContext) -> Optional[int]:
     chosen_data = []
     message = update.callback_query.message
     choice = get_message_text(update)
