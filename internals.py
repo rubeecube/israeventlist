@@ -17,7 +17,7 @@ def get_lang(update: Update):
     except AttributeError:
         pass
 
-    return None
+    return "en"
 
 
 def initialize(update: Update, context: CallbackContext) -> None:

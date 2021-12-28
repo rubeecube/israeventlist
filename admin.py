@@ -96,6 +96,7 @@ def main():
             INTEREST_ADD_PARENT: [CallbackQueryHandler(funa_handle_interest_add_parent)],
             INTEREST_ADD_NAME: [MessageHandler(Filters.text & ~Filters.command & filter_admin, funa_interest_add_name)],
 
+            EVENT_ADD_HANDLE_CHOICE: [CallbackQueryHandler(EVENT_ADD_HANDLE_CHOICE)],
             EVENT_ADD_NAME: [MessageHandler(Filters.text & ~Filters.command & filter_admin, funa_event_add_name)],
             EVENT_ADD_DESC: [MessageHandler(Filters.text & ~Filters.command & filter_admin, funa_event_add_desc)],
             EVENT_ADD_DATE: [MessageHandler(Filters.text & ~Filters.command & filter_admin, funa_event_add_date)],
