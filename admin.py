@@ -57,12 +57,6 @@ def funa_handle_add(update: Update, context: CallbackContext) -> int:
         return funa_handle_add_event(update, context)
 
 
-def funa_push(update: Update, context: CallbackContext) -> int:
-    send_message('push', update, context)
-
-    return PUSH
-
-
 def funa_nominal(update: Update, context: CallbackContext) -> int:
     if get_message_text(update) == localize("exit menu", get_lang(update)):
         send_message('inform commands', update, context)
@@ -108,7 +102,6 @@ def main():
         name="IsraEventListAdmin_bot",
         fallbacks=[
             CommandHandler('add', funa_add, filter_admin),
-            CommandHandler('push', funa_push, filter_admin),
             CommandHandler('commands', funa_commands, filter_admin),
         ],
         persistent=True,
