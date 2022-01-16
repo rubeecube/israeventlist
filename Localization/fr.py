@@ -80,7 +80,52 @@ dic = {
 
     'retry': "Reessayez",
 
-    'info to add': "Choisissez les champs à remplir"
+    'info to add': "Choisissez les champs à remplir",
+
+    # MAASSER
+    "MASR: welcome text": "Bonjour \nCe bot aide a comptabiliser les sorties et entrées d'argent pour remplir la"
+                          " mitsvah du Maasser au mieux.\nPour ajouter un salaire, envoyez /receive ou /salaire.\n"
+                          "Pour enregistrer un don envoyez /give ou /don.\n"
+                          "Pour afficher un résumé, envoyez /view ou /resume.\n"
+                          "Les données sont enregistrées de façon securisées et protégées par un mot de passe.\n"
+                          "Pour en savoir plus envoyez /details.\n"
+                          "Pour contacter l'auteur encoyer /contact.",
+    "MASR: details": "Chaque donnée est protegée via le mot de passe inséré à la premiere utilisation.\n"
+                     "Les données ne sont dévoilées que lors de l'affichage.\n"
+                     "Ni le robot, ni l'auteur ne sont capables de lire les données.\n"
+                     "Pour les details techniques, envoyez /details2.",
+    "MASR: details2": "A l'initialization, une paire de clé RSA 3072 est generée. la clé privée est chifrée grâce "
+                      "au mot de passe inséré.\n"
+                      "Dans la base de données figurent: la clé publique et la clé privée (chiffrée avec le mot de "
+                      "passe)), et un tableau de données chiffrées.\n"
+                      "A chaque insertion, une clé symetrique est générée, chiffrée grâce a la clé publique, "
+                      "l'insertion (date, montant) est chifrée (avec AES GCM 128) et stockée en attente de"
+                      " consolidation.\n"
+                      "Lors de l'affichage, la clé privée est déchifrée et toutes les données en attente le sont aussi,"
+                      " elles sont ensuite consolidées en un seul message, le tout est ensuite rechiffré.\n"
+                      "J'en ai assez dit jusqu'à présent, pour plus: /contact :D.",
+    'MASR: user not found': "Pour utiliser le service, merci de choisir un mot de passe. Il vous sera demandé a chaque "
+                            "affichage. Attention, en case de perte nous ne serons pas en mesure de le retrouver."
+                            "Vous perdrez alors toutes les données (Sauf les tableaux affichés).",
+    'MASR: user found': 'Le compte à déjà été initialisé.',
+    "MASR: command list": 'Liste des commandes',
+    'MASR: date': "Date?\nFormats acceptés:  'Lundi, Demain, 07/06/2022...'",
+
+    'MASR: retry': 'Rééssayez...',
+    "MASR: amount": 'Montant. Par defaut (sans symbole ajouté) la devise est le shekel.\n'
+                    'Pour preciser un montant en Euro ou Dollar, ajouter le symbole. (EUR, €, ou USD, $).',
+    'MASR: amount table': 'Montant (NIS)',
+    'MASR: percentage': 'Pourcentage',
+    "MASR: explain table": "Un montant négatif signale ce que vous devez encore verser ce mois-ci.",
+    "MASR: added": 'Ajouté!',
+    "MASR: password set": 'Enregistré!',
+    "MASR: password?": "Veuillez inserer votre mot de passe",
+    "MASR: invalid, bad password?": "Mot de passe érroné!",
+
+    'Yesterday': 'Hier',
+    'Today': "Aujourd'hui",
+    'month': "Mois",
+
 }
 
 

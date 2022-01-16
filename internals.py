@@ -4,6 +4,7 @@ from Unit import User
 from Database.UserDatabase import UserDatabase
 from Localization import localize
 from typing import List, Optional, Union
+from telegram import ParseMode
 
 
 def get_lang(update: Update):
@@ -174,14 +175,20 @@ def edit_message(message, update: Update, context: CallbackContext, reply_markup
 def send_message(message, update: Update,
                  context: CallbackContext,
                  reply_markup: Union[InlineKeyboardMarkup, ReplyKeyboardMarkup] = None,
-                 local: bool = True):
+                 local: bool = True,
+                 html: bool = None):
     if local:
         message = localize(message, get_lang(update))
 
+    parse_mode = None
+    if html:
+        parse_mode = ParseMode.HTML
+
     if update.message is not None:
-        update.message.reply_text(text=message, reply_markup=reply_markup)
+        update.message.reply_text(text=message, reply_markup=reply_markup, parse_mode=parse_mode)
 
     if update.callback_query is not None:
-        context.bot.send_message(text=message, chat_id=update.callback_query.message.chat_id, reply_markup=reply_markup)
+        context.bot.send_message(text=message, chat_id=update.callback_query.message.chat_id, reply_markup=reply_markup,
+                                 parse_mode=parse_mode)
 
 

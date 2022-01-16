@@ -5,6 +5,7 @@ from Database import DatabaseHelper
 from Database.EventDatabase import EventDatabase
 from Database.POIDatabase import POIDatabase
 from Database.UserDatabase import UserDatabase
+from Database.MaasserUserDatabase import MaasserUserDatabase
 from Database.InterestDatabase import InterestDatabase
 
 
@@ -111,6 +112,21 @@ class POI (Unit):
 class User(Unit):
     database_class = UserDatabase
     attr = ['telegram_id', 'phone', 'location', 'user_data', 'interests', 'misc']
+
+
+class MaasserUser(Unit):
+    database_class = MaasserUserDatabase
+    attr = ['telegram_id', 'public_key', 'encrypted_private_key', 'encrypted_data']
+
+    def __init__(self, telegram_id=None):
+        if telegram_id is None:
+            super(MaasserUser, self).__init__()
+            return
+
+        maasser_db = MaasserUserDatabase()
+        maasser_user = maasser_db.get(telegram_id)
+        user = MaasserUser.get
+        super(MaasserUser, self).__init__()
 
 
 class Interest(Unit):
