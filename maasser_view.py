@@ -1,13 +1,6 @@
-import json
-
 from internals import *
 from maasser_state_management import *
-import dateparser
-
-from json2html import json2html
-
 from Database.MaasserUserDatabase import MaasserUserDatabase
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 import prettytable as pt
 
 
@@ -32,6 +25,7 @@ def fun_maasser_view_print(update: Update, context: CallbackContext) -> int:
 
     maasser_user_db = MaasserUserDatabase()
 
+    maasser_user = maasser_user_db.get(telegram_id)
     data = maasser_user_db.consolidate(telegram_id, password)
     if data is None:
         send_message("MASR: invalid, bad password?", update, context)
@@ -45,19 +39,20 @@ def fun_maasser_view_print(update: Update, context: CallbackContext) -> int:
 
         table = {}
         for d in data:
-            date = dateparser.parse(d['date'], date_formats=['%Y-%m-%d']).date()
+            date = parse_date_db(d['date'])
             my = date.strftime("%m/%y")
             if my not in table:
                 table[my] = 0
             amount = d['amount']
             if amount < 0:
-                amount *= 0.10
+                amount *= maasser_user.percentage/100
             table[my] += amount
 
         for k in list(table.keys()):
             table_pt.add_row([k, f'{table[k]:.2f}'])
 
-        send_message(localize("MASR: percentage", get_lang(update)) + ": 10%", update, context, local=False)
+        send_message(localize("MASR: percentage", get_lang(update)) + f": {maasser_user.percentage}%",
+                     update, context, local=False)
         send_message("MASR: explain table", update, context)
         send_message(f'<pre>{table_pt}</pre>', update, context, html=True)
 

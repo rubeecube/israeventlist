@@ -87,6 +87,7 @@ dic = {
                           " mitsvah du Maasser au mieux.\nPour ajouter un salaire, envoyez /receive ou /salaire.\n"
                           "Pour enregistrer un don envoyez /give ou /don.\n"
                           "Pour afficher un résumé, envoyez /view ou /resume.\n"
+                          "Pour changer le pourcentage du maasser, envoyez /maasser.\n"
                           "Les données sont enregistrées de façon securisées et protégées par un mot de passe.\n"
                           "Pour en savoir plus envoyez /details.\n"
                           "Pour contacter l'auteur encoyer /contact.",
@@ -121,6 +122,16 @@ dic = {
     "MASR: password set": 'Enregistré!',
     "MASR: password?": "Veuillez inserer votre mot de passe",
     "MASR: invalid, bad password?": "Mot de passe érroné!",
+
+    "MASR: command commands": "Afficher la liste des commandes",
+    "MASR: command don": "Enregistrer un don",
+    "MASR: command salaire": "Enregistrer un salaire",
+    "MASR: command maasser": "Changer le pourcentage du Maasser",
+    "MASR: command contact": "Contacter l'auteur",
+    "MASR: command details": "Afficher les details",
+    "MASR: percentage ask": "Quel est le nouveau pourcentage à appliquer?",
+    "MASR: changed": "Changé!",
+    "MASR: error": "Erreur...",
 
     'Yesterday': 'Hier',
     'Today': "Aujourd'hui",

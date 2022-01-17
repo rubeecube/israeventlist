@@ -1,14 +1,10 @@
 import json
 import os
-import sqlite3
 import Database
-import base64
 
 from cryptography.hazmat.primitives import serialization as crypto_serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives import hashes
-from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-from cryptography.hazmat.primitives.keywrap import aes_key_wrap_with_padding, aes_key_unwrap_with_padding, InvalidUnwrap
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from cryptography.hazmat.primitives.asymmetric import padding
 
@@ -20,6 +16,7 @@ class MaasserUserDatabase(Database.DatabaseHelper):
             CREATE TABLE %s (
                id                       INTEGER     PRIMARY KEY     AUTOINCREMENT,
                telegram_id              TEXT        UNIQUE,
+               percentage               INT         NOT NULL,
                public_key               TEXT        NOT NULL,
                encrypted_private_key    TEXT        NOT NULL,
                encrypted_data           TEXT        NOT NULL
@@ -119,6 +116,8 @@ class MaasserUserDatabase(Database.DatabaseHelper):
 
         public_key = MaasserUserDatabase.__dump_public_key(key.public_key())
 
+        percentage = 10
+
         encrypted_data = json.dumps(
             {
                 'consolidated': [],
@@ -128,9 +127,9 @@ class MaasserUserDatabase(Database.DatabaseHelper):
 
         row = self.cur.execute(
             'INSERT INTO  %s'
-            ' (telegram_id, public_key, encrypted_private_key, encrypted_data)'
-            ' VALUES (?, ?, ?, ?);' % self.table_name,
-            (telegram_id, public_key, encrypted_private_key, encrypted_data)
+            ' (telegram_id, percentage, public_key, encrypted_private_key, encrypted_data)'
+            ' VALUES (?, ?, ?, ?, ?);' % self.table_name,
+            (telegram_id, percentage, public_key, encrypted_private_key, encrypted_data)
         )
         self.con.commit()
 
@@ -239,10 +238,12 @@ class MaasserUserDatabase(Database.DatabaseHelper):
 
         maasser_user = MaasserUser()
 
-        row_id, telegram_id, public_key, encrypted_private_key, encrypted_data = row
+        row_id, telegram_id, percentage, public_key, encrypted_private_key, encrypted_data = row
 
         if telegram_id is not None:
             maasser_user.telegram_id = telegram_id
+        if percentage is not None:
+            maasser_user.percentage = percentage
         if public_key is not None:
             maasser_user.public_key = public_key
         if encrypted_private_key is not None:
@@ -251,3 +252,15 @@ class MaasserUserDatabase(Database.DatabaseHelper):
             maasser_user.encrypted_data = encrypted_data
 
         return maasser_user
+
+    def set_maasser(self, telegram_id, amount):
+        row = self.cur.execute(
+            'UPDATE %s'
+            ' SET'
+            ' percentage = ?'
+            ' WHERE telegram_id = ?;' % self.table_name,
+            (amount, telegram_id)
+        )
+        self.con.commit()
+
+        return row

@@ -25,7 +25,7 @@ from maasser_view import *
 
 def get_maasser_raw_commands(lang="fr"):
     commands = []
-    for command in ["commands", "don", "salaire", "contact", "details", "stop"]:
+    for command in ["commands", "don", "salaire", "maasser", "contact", "details", "stop"]:
         commands += [
             ("/%s" % command, "%s" % localize("MASR: command %s" % command, lang)),
         ]
@@ -60,6 +60,49 @@ def fun_maasser_start(update: Update, context: CallbackContext) -> Optional[int]
 
     send_message("MASR: welcome text", update, context)
     send_message("MASR: user found", update, context)
+
+    return MAASSER_NOMINAL
+
+
+def fun_maasser_percentage(update: Update, context: CallbackContext) -> Optional[int]:
+    telegram_id = update.effective_user.id
+    maasser_user_db = MaasserUserDatabase()
+    maasser_user = maasser_user_db.get(telegram_id)
+    if maasser_user is None:
+        send_message("MASR: welcome text", update, context)
+        send_message("MASR: user not found", update, context)
+        return MAASSER_PASSWORD_INIT
+
+    send_message("MASR: percentage ask", update, context)
+
+    return MAASSER_PERCENTAGE
+
+
+def fun_maasser_percentage_change(update: Update, context: CallbackContext) -> Optional[int]:
+    telegram_id = update.effective_user.id
+    maasser_user_db = MaasserUserDatabase()
+    maasser_user = maasser_user_db.get(telegram_id)
+    if maasser_user is None:
+        send_message("MASR: welcome text", update, context)
+        send_message("MASR: user not found", update, context)
+        return MAASSER_PASSWORD_INIT
+
+    amount_original = get_message_text(update)
+
+    try:
+        amount_i = int(amount_original)
+    except ValueError:
+        send_message("MASR: error", update, context)
+        return MAASSER_NOMINAL
+
+    if amount_i < 0 or amount_i > 100:
+        send_message("MASR: error", update, context)
+        return MAASSER_NOMINAL
+
+    if maasser_user_db.set_maasser(telegram_id, amount_i):
+        send_message("MASR: changed", update, context)
+    else:
+        send_message("MASR: error", update, context)
 
     return MAASSER_NOMINAL
 
@@ -137,6 +180,7 @@ def main():
             MAASSER_RECEIVE_AMOUNT: [MessageHandler(Filters.all & ~Filters.command, fun_maasser_receive_amount)],
             MAASSER_RECEIVE_DATE: [MessageHandler(Filters.all & ~Filters.command, fun_maasser_receive_date)],
             MAASSER_VIEW: [MessageHandler(Filters.all & ~Filters.command, fun_maasser_view_print)],
+            MAASSER_PERCENTAGE: [MessageHandler(Filters.all & ~Filters.command, fun_maasser_percentage_change)],
         },
         name="Maasser_bot",
         fallbacks=[
@@ -151,6 +195,7 @@ def main():
             CommandHandler('salaire', fun_maasser_receive),
             CommandHandler('view', fun_maasser_view),
             CommandHandler('resume', fun_maasser_view),
+            CommandHandler('maasser', fun_maasser_percentage),
         ],
         persistent=True,
         allow_reentry=True

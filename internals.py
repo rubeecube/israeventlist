@@ -5,7 +5,8 @@ from Database.UserDatabase import UserDatabase
 from Localization import localize
 from typing import List, Optional, Union
 from telegram import ParseMode
-
+import datetime
+import dateparser
 
 def get_lang(update: Update):
     #try:
@@ -191,4 +192,15 @@ def send_message(message, update: Update,
         context.bot.send_message(text=message, chat_id=update.callback_query.message.chat_id, reply_markup=reply_markup,
                                  parse_mode=parse_mode)
 
+
+def datetime_to_db(date: datetime.datetime) -> str:
+    return date.strftime('%Y-%m-%d')
+
+
+def parse_date(date: str) -> datetime.datetime:
+    return dateparser.parse(date, locales=['fr']).date()
+
+
+def parse_date_db(date: str) -> datetime.datetime:
+    return dateparser.parse(date, date_formats=['%Y-%m-%d']).date()
 

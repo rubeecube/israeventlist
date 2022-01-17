@@ -1,3 +1,5 @@
+import datetime
+
 from internals import *
 from maasser_state_management import *
 
@@ -35,7 +37,10 @@ def fun_maasser_give_date(update: Update, context: CallbackContext) -> int:
     message.delete()
 
     try:
-        context.chat_data['ADD'] = dateparser.parse(date, locales=['fr']).date().strftime('%Y-%m-%d')
+        context.chat_data['ADD'] = {
+            'parsed_date': parse_date(date),
+            'original_date': date
+        }
     except (TypeError, ValueError):
         send_message('MASR: retry', update, context)
         return
@@ -48,10 +53,11 @@ def fun_maasser_give_date(update: Update, context: CallbackContext) -> int:
 def fun_maasser_give_amount(update: Update, context: CallbackContext) -> int:
     telegram_id = update.effective_user.id
     message = get_message(update)
-    amount = get_message_text(update)
+    amount_original = get_message_text(update)
     message.delete()
 
     try:
+        amount = amount_original
         if 'EUR' in amount or '€' in amount:
             amount = amount.replace('EUR', '').replace('€', '')
             amount = float(amount) / MaasserCurrency.get_exchanges_rates()['ILS:EUR']
@@ -64,7 +70,10 @@ def fun_maasser_give_amount(update: Update, context: CallbackContext) -> int:
         return
 
     data = {
-        'date': context.chat_data['ADD'],
+        'created': datetime_to_db(datetime.datetime.now()),
+        'date': datetime_to_db(context.chat_data['ADD']['parsed_date']),
+        'date_original': context.chat_data['ADD']['original_date'],
+        'amount_original': amount_original,
         'amount': amount_f
     }
 
@@ -103,7 +112,10 @@ def fun_maasser_receive_date(update: Update, context: CallbackContext) -> int:
     message.delete()
 
     try:
-        context.chat_data['ADD'] = dateparser.parse(date, locales=['fr']).date().strftime('%Y-%m-%d')
+        context.chat_data['ADD'] = {
+            'parsed_date': parse_date(date),
+            'original_date': date
+        }
     except (TypeError, ValueError):
         send_message('MASR: retry', update, context)
         return
@@ -116,10 +128,11 @@ def fun_maasser_receive_date(update: Update, context: CallbackContext) -> int:
 def fun_maasser_receive_amount(update: Update, context: CallbackContext) -> int:
     telegram_id = update.effective_user.id
     message = get_message(update)
-    amount = get_message_text(update)
+    amount_original = get_message_text(update)
     message.delete()
 
     try:
+        amount = amount_original
         if 'EUR' in amount or '€' in amount:
             amount = amount.replace('EUR', '').replace('€', '')
             amount = float(amount) / MaasserCurrency.get_exchanges_rates()['ILS:EUR']
@@ -132,7 +145,10 @@ def fun_maasser_receive_amount(update: Update, context: CallbackContext) -> int:
         return
 
     data = {
-        'date': context.chat_data['ADD'],
+        'created': datetime_to_db(datetime.datetime.now()),
+        'date': datetime_to_db(context.chat_data['ADD']['parsed_date']),
+        'date_original': context.chat_data['ADD']['original_date'],
+        'amount_original': amount_original,
         'amount': -amount_f
     }
 

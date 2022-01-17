@@ -116,7 +116,7 @@ class User(Unit):
 
 class MaasserUser(Unit):
     database_class = MaasserUserDatabase
-    attr = ['telegram_id', 'public_key', 'encrypted_private_key', 'encrypted_data']
+    attr = ['telegram_id', 'percentage', 'public_key', 'encrypted_private_key', 'encrypted_data']
 
     def __init__(self, telegram_id=None):
         if telegram_id is None:
