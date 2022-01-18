@@ -2,6 +2,7 @@ from internals import *
 from maasser_state_management import *
 from Database.MaasserUserDatabase import MaasserUserDatabase
 import prettytable as pt
+from maasser_currency import MaasserCurrency
 
 
 def fun_maasser_view(update: Update, context: CallbackContext) -> int:
@@ -29,31 +30,34 @@ def fun_maasser_view_print(update: Update, context: CallbackContext) -> int:
     data = maasser_user_db.consolidate(telegram_id, password)
     if data is None:
         send_message("MASR: invalid, bad password?", update, context)
-    else:
-        table_pt = pt.PrettyTable([
-            localize('month', get_lang(update)),
-            localize('MASR: amount table', get_lang(update))
-        ])
-        table_pt.align['Symbol'] = 'l'
-        table_pt.align['Amount'] = 'r'
+        return MAASSER_NOMINAL
 
-        table = {}
-        for d in data:
-            date = parse_date_db(d['date'])
-            my = date.strftime("%m/%y")
-            if my not in table:
-                table[my] = 0
-            amount = d['amount']
-            if amount < 0:
-                amount *= maasser_user.percentage/100
-            table[my] += amount
+    table_pt = pt.PrettyTable([
+        localize('month', get_lang(update)),
+        localize('MASR: amount table--format', get_lang(update)).format(
+            MaasserCurrency.currency_to_str(maasser_user.currency)
+        )
+    ])
+    table_pt.align['Symbol'] = 'l'
+    table_pt.align['Amount'] = 'r'
 
-        for k in list(table.keys()):
-            table_pt.add_row([k, f'{table[k]:.2f}'])
+    table = {}
+    for d in data:
+        date = parse_date_db(d['date'])
+        my = date.strftime("%m/%y")
+        if my not in table:
+            table[my] = 0
+        amount = d['amount']
+        if d['type'] == 'RECEIVE':
+            amount *= -maasser_user.percentage/100
+        table[my] += amount
 
-        send_message(localize("MASR: percentage", get_lang(update)) + f": {maasser_user.percentage}%",
-                     update, context, local=False)
-        send_message("MASR: explain table", update, context)
-        send_message(f'<pre>{table_pt}</pre>', update, context, html=True)
+    for k in list(table.keys()):
+        table_pt.add_row([k, f'{table[k]:.2f}'])
+
+    send_message(localize("MASR: percentage", get_lang(update)) + f": {maasser_user.percentage}%",
+                 update, context, local=False)
+    send_message("MASR: explain table", update, context)
+    send_message(f'<pre>{table_pt}</pre>', update, context, html=True)
 
     return MAASSER_NOMINAL

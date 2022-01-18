@@ -1,6 +1,7 @@
 import json
 import os
 import Database
+from maasser_currency import MaasserCurrency
 
 from cryptography.hazmat.primitives import serialization as crypto_serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
@@ -17,6 +18,7 @@ class MaasserUserDatabase(Database.DatabaseHelper):
                id                       INTEGER     PRIMARY KEY     AUTOINCREMENT,
                telegram_id              TEXT        UNIQUE,
                percentage               INT         NOT NULL,
+               currency                 INT         NOT NULL,
                public_key               TEXT        NOT NULL,
                encrypted_private_key    TEXT        NOT NULL,
                encrypted_data           TEXT        NOT NULL
@@ -118,6 +120,8 @@ class MaasserUserDatabase(Database.DatabaseHelper):
 
         percentage = 10
 
+        currency = MaasserUserDatabase.CURRENCY_ILS
+
         encrypted_data = json.dumps(
             {
                 'consolidated': [],
@@ -127,9 +131,9 @@ class MaasserUserDatabase(Database.DatabaseHelper):
 
         row = self.cur.execute(
             'INSERT INTO  %s'
-            ' (telegram_id, percentage, public_key, encrypted_private_key, encrypted_data)'
-            ' VALUES (?, ?, ?, ?, ?);' % self.table_name,
-            (telegram_id, percentage, public_key, encrypted_private_key, encrypted_data)
+            ' (telegram_id, percentage, currency, public_key, encrypted_private_key, encrypted_data)'
+            ' VALUES (?, ?, ?, ?, ?, ?);' % self.table_name,
+            (telegram_id, percentage, currency, public_key, encrypted_private_key, encrypted_data)
         )
         self.con.commit()
 
@@ -167,7 +171,7 @@ class MaasserUserDatabase(Database.DatabaseHelper):
 
         return row
 
-    def consolidate(self, telegram_id, password):
+    def consolidate(self, telegram_id, password, save=True):
         maasser_user = self.get(telegram_id)
 
         private_key = MaasserUserDatabase.__load_private_key(maasser_user.encrypted_private_key, password)
@@ -204,7 +208,7 @@ class MaasserUserDatabase(Database.DatabaseHelper):
                 decrypted_data_sub = json.loads(decrypted_data_sub)
                 decrypted_data += [decrypted_data_sub]
 
-        if decrypted_data:
+        if save and decrypted_data:
             dek, nonce, encrypted_data_sub = MaasserUserDatabase.__encrypt_data(telegram_id, decrypted_data)
 
             encrypted_dek = MaasserUserDatabase.__wrap_key(dek, public_key)
@@ -238,12 +242,14 @@ class MaasserUserDatabase(Database.DatabaseHelper):
 
         maasser_user = MaasserUser()
 
-        row_id, telegram_id, percentage, public_key, encrypted_private_key, encrypted_data = row
+        row_id, telegram_id, percentage, currency, public_key, encrypted_private_key, encrypted_data = row
 
         if telegram_id is not None:
             maasser_user.telegram_id = telegram_id
         if percentage is not None:
             maasser_user.percentage = percentage
+        if currency is not None:
+            maasser_user.currency = currency
         if public_key is not None:
             maasser_user.public_key = public_key
         if encrypted_private_key is not None:
@@ -264,3 +270,55 @@ class MaasserUserDatabase(Database.DatabaseHelper):
         self.con.commit()
 
         return row
+
+    def set_currency(self, telegram_id, currency, password):
+        if currency not in MaasserCurrency.CURRENCIES:
+            return False
+
+        maasser_user = self.get(telegram_id)
+        if currency == maasser_user.currency:
+            return True
+
+        data = self.consolidate(telegram_id, password, save=False)
+
+        data2 = [k for k in data]
+        data = []
+        for k in data2:
+            kk = k
+            amount = float(MaasserCurrency.strip_currency_from_str(str(kk['amount_original'])))
+            kk['amount'] = MaasserCurrency.exchange(amount, kk['currency_current'], currency)
+            data += [kk]
+
+        if data:
+            public_key = MaasserUserDatabase.__load_public_key(maasser_user.public_key)
+
+            dek, nonce, encrypted_data_sub = MaasserUserDatabase.__encrypt_data(telegram_id, data)
+
+            encrypted_dek = MaasserUserDatabase.__wrap_key(dek, public_key)
+
+            encrypted_data = json.dumps(
+                {
+                    'consolidated': [encrypted_dek.hex(), nonce.hex(), encrypted_data_sub.hex()],
+                    'unconsolidated': []
+                }
+            )
+
+            row = self.cur.execute(
+                'UPDATE %s'
+                ' SET'
+                ' encrypted_data = ?'
+                ' WHERE telegram_id = ?;' % self.table_name,
+                (encrypted_data, telegram_id)
+            )
+            if row:
+                row = self.cur.execute(
+                    'UPDATE %s'
+                    ' SET'
+                    ' currency = ?'
+                    ' WHERE telegram_id = ?;' % self.table_name,
+                    (currency, telegram_id)
+                )
+            self.con.commit()
+
+            return not not row
+        return True

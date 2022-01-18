@@ -84,16 +84,18 @@ dic = {
 
     # MAASSER
     "MASR: welcome text": "Bonjour \nCe bot aide a comptabiliser les sorties et entrées d'argent pour remplir la"
-                          " mitsvah du Maasser au mieux.\nPour ajouter un salaire, envoyez /receive ou /salaire.\n"
-                          "Pour enregistrer un don envoyez /give ou /don.\n"
-                          "Pour afficher un résumé, envoyez /view ou /resume.\n"
+                          " mitsvah du Maasser au mieux.\nPour ajouter un salaire, envoyez /salaire.\n"
+                          "Pour enregistrer un don envoyez /don.\n"
+                          "Pour afficher un résumé, envoyez /recap.\n"
                           "Pour changer le pourcentage du maasser, envoyez /maasser.\n"
+                          "Pour changer la devise, envoyez /devise.\n"
                           "Les données sont enregistrées de façon securisées et protégées par un mot de passe.\n"
                           "Pour en savoir plus envoyez /details.\n"
                           "Pour contacter l'auteur encoyer /contact.",
     "MASR: details": "Chaque donnée est protegée via le mot de passe inséré à la premiere utilisation.\n"
                      "Les données ne sont dévoilées que lors de l'affichage.\n"
-                     "Ni le robot, ni l'auteur ne sont capables de lire les données.\n"
+                     "Ni le robot, ni l'auteur ne sont capables de lire les données (Sauf le pourcentage de Maasser "
+                     "pour des raisons techniques).\n"
                      "Pour les details techniques, envoyez /details2.",
     "MASR: details2": "A l'initialization, une paire de clé RSA 3072 est generée. la clé privée est chifrée grâce "
                       "au mot de passe inséré.\n"
@@ -113,9 +115,9 @@ dic = {
     'MASR: date': "Date?\nFormats acceptés:  'Lundi, Demain, 07/06/2022...'",
 
     'MASR: retry': 'Rééssayez...',
-    "MASR: amount": 'Montant. Par defaut (sans symbole ajouté) la devise est le shekel.\n'
-                    'Pour preciser un montant en Euro ou Dollar, ajouter le symbole. (EUR, €, ou USD, $).',
-    'MASR: amount table': 'Montant (NIS)',
+    "MASR: amount--format": 'Montant en {}.\n'
+                    'Pour insérer une autre devise, ajouter un symbole (EUR, €, USD, $, ILS, ₪).',
+    'MASR: amount table--format': 'Montant ({})',
     'MASR: percentage': 'Pourcentage',
     "MASR: explain table": "Un montant négatif signale ce que vous devez encore verser ce mois-ci.",
     "MASR: added": 'Ajouté!',
@@ -129,9 +131,14 @@ dic = {
     "MASR: command maasser": "Changer le pourcentage du Maasser",
     "MASR: command contact": "Contacter l'auteur",
     "MASR: command details": "Afficher les details",
+    "MASR: command devise": "Changer la devise par défaut",
+    "MASR: command recap": "Afficher un tableau récaputilatif",
+
     "MASR: percentage ask": "Quel est le nouveau pourcentage à appliquer?",
     "MASR: changed": "Changé!",
     "MASR: error": "Erreur...",
+
+    "MASR: currency ask": "Quel est la nouvelle devise à appliquer (EUR, ILS, USD)?",
 
     'Yesterday': 'Hier',
     'Today': "Aujourd'hui",
