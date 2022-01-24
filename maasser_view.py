@@ -50,7 +50,7 @@ def fun_maasser_view_print(update: Update, context: CallbackContext) -> int:
         amount = d['amount']
         if d['type'] == 'RECEIVE':
             amount *= -maasser_user.percentage/100
-        table[my] += amount
+        table[my] += float(amount)
 
     for k in list(table.keys()):
         table_pt.add_row([k, f'{table[k]:.2f}'])
