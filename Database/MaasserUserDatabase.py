@@ -1,3 +1,4 @@
+import hashlib
 import json
 import os
 import Database
@@ -125,7 +126,8 @@ class MaasserUserDatabase(Database.DatabaseHelper):
         encrypted_data = json.dumps(
             {
                 'consolidated': [],
-                'unconsolidated': []
+                'unconsolidated': [],
+                'removal_hash': [],
             }
         )
 
@@ -171,6 +173,33 @@ class MaasserUserDatabase(Database.DatabaseHelper):
 
         return row
 
+    def remove_data(self, telegram_id, data_fingerprint):
+        maasser_user = self.get(telegram_id)
+
+        encrypted_data = json.loads(maasser_user.encrypted_data)
+
+        if 'removal_hash' not in list(encrypted_data.keys()):
+            encrypted_data['removal_hash'] = []
+
+        encrypted_data['removal_hash'] += [data_fingerprint]
+
+        encrypted_data = json.dumps(encrypted_data)
+
+        row = self.cur.execute(
+            'UPDATE %s'
+            ' SET'
+            ' encrypted_data = ?'
+            ' WHERE telegram_id = ?;' % self.table_name,
+            (encrypted_data, telegram_id)
+        )
+        self.con.commit()
+
+        return row
+
+    @staticmethod
+    def fingerprint(data):
+        return hashlib.sha256(json.dumps(data).encode()).hexdigest()
+
     def consolidate(self, telegram_id, password, save=True):
         maasser_user = self.get(telegram_id)
 
@@ -179,7 +208,6 @@ class MaasserUserDatabase(Database.DatabaseHelper):
             return None
 
         encrypted_data = json.loads(maasser_user.encrypted_data)
-
         public_key = MaasserUserDatabase.__load_public_key(maasser_user.public_key)
 
         decrypted_data = []
@@ -209,6 +237,13 @@ class MaasserUserDatabase(Database.DatabaseHelper):
                 decrypted_data += [decrypted_data_sub]
 
         if save and decrypted_data:
+            removal_hash = []
+            if 'removal_hash' in list(encrypted_data.keys()):
+                removal_hash = [r for r in encrypted_data['removal_hash']]
+
+            if removal_hash:
+                decrypted_data = [d for d in decrypted_data if MaasserUserDatabase.fingerprint(d) not in removal_hash]
+
             dek, nonce, encrypted_data_sub = MaasserUserDatabase.__encrypt_data(telegram_id, decrypted_data)
 
             encrypted_dek = MaasserUserDatabase.__wrap_key(dek, public_key)
@@ -216,7 +251,8 @@ class MaasserUserDatabase(Database.DatabaseHelper):
             encrypted_data = json.dumps(
                 {
                     'consolidated': [encrypted_dek.hex(), nonce.hex(), encrypted_data_sub.hex()],
-                    'unconsolidated': []
+                    'unconsolidated': [],
+                    'removal_hash': [],
                 }
             )
 

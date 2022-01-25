@@ -166,27 +166,33 @@ class ReplyMarkupHelper:
             only_selected=False,
             return_selected=False,
             multi_select=True
-    ) -> Union[InlineKeyboardMarkup, List]:
+   ) -> Union[InlineKeyboardMarkup, List]:
 
         button_list = []
         button_selected = []
         selected = []
 
         for i, d in enumerate(data):
-            i = str(i)
-            button1 = InlineKeyboardButton("%s" % d, callback_data=i)
+            if isinstance(d, list):
+                d_str = d[0]
+                callback_data = d[1]
+            else:
+                d_str = d
+                callback_data = str(i)
+
+            button1 = [InlineKeyboardButton("%s" % d_str, callback_data=callback_data)]
 
             if chosen_data is not None and i in chosen_data:
-                selected += [d]
-                button_selected += [[button1]]
-                button2 = InlineKeyboardButton(Globals.EMOJI_CHECKED, callback_data=i)
+                selected += [d_str]
+                button_selected += [button1]
+                button2 = [InlineKeyboardButton(Globals.EMOJI_CHECKED, callback_data=callback_data)]
             else:
-                button2 = InlineKeyboardButton(Globals.EMOJI_WHITE_SQUARE, callback_data=i)
+                button2 = [InlineKeyboardButton(Globals.EMOJI_WHITE_SQUARE, callback_data=callback_data)]
 
             if multi_select:
-                button_list += [[button1, button2]]
+                button_list += [button1 + button2]
             else:
-                button_list += [[button1]]
+                button_list += [button1]
 
         if return_selected:
             return selected

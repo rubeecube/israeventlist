@@ -68,6 +68,8 @@ def fun_maasser_give_annex_amount(update: Update, context: CallbackContext,
     amount = amount_original
     try:
         currency = MaasserCurrency.get_currency_from_str(amount)
+        if currency is None:
+            currency = user_currency
         amount = MaasserCurrency.strip_currency_from_str(amount)
         amount = MaasserCurrency.exchange(amount, currency, user_currency)
     except ValueError:

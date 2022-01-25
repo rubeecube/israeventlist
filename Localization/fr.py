@@ -133,9 +133,12 @@ dic = {
     "MASR: command details": "Afficher les details",
     "MASR: command devise": "Changer la devise par défaut",
     "MASR: command recap": "Afficher un tableau récaputilatif",
+    "MASR: command edit": "Supprimer une entrée",
 
+    "MASR: choose edit": "Choisir la ligne à supprimer",
     "MASR: percentage ask": "Quel est le nouveau pourcentage à appliquer?",
     "MASR: changed": "Changé!",
+    "MASR: removed": "Supprimé!",
     "MASR: error": "Erreur...",
 
     "MASR: currency ask": "Quel est la nouvelle devise à appliquer (EUR, ILS, USD)?",

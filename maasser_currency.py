@@ -58,13 +58,22 @@ class MaasserCurrency:
         return amount
 
     @classmethod
-    def currency_to_str(cls, currency):
+    def currency_to_str(cls, currency, symbol=True):
         if currency == cls.CURRENCY_EUR:
-            return 'EUR'
+            if symbol:
+                return "€"
+            else:
+                return 'EUR'
         if currency == cls.CURRENCY_ILS:
-            return 'ILS'
+            if symbol:
+                return "₪"
+            else:
+                return 'ILS'
         if currency == cls.CURRENCY_USD:
-            return 'USD'
+            if symbol:
+                return "$"
+            else:
+                return 'USD'
 
     @classmethod
     def str_to_currency(cls, s):

@@ -27,6 +27,11 @@ def fun_maasser_view_print(update: Update, context: CallbackContext) -> int:
     maasser_user_db = MaasserUserDatabase()
 
     maasser_user = maasser_user_db.get(telegram_id)
+    if maasser_user is None:
+        send_message("MASR: welcome text", update, context)
+        send_message("MASR: user not found", update, context)
+        return MAASSER_PASSWORD_INIT
+
     data = maasser_user_db.consolidate(telegram_id, password)
     if data is None:
         send_message("MASR: invalid, bad password?", update, context)
