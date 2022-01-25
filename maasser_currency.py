@@ -7,7 +7,7 @@ import re
 
 
 class MaasserCurrency:
-    strip_re = re.compile(re.escape('eur|ils|usd|€|₪|$'), re.IGNORECASE)
+    strip_re = re.compile('eur|ils|usd|€|₪|\$', re.IGNORECASE)
     CURRENCIES = [CURRENCY_ILS, CURRENCY_EUR, CURRENCY_USD] = range(3)
 
     exchanges_rates = None
@@ -96,5 +96,5 @@ class MaasserCurrency:
 
     @classmethod
     def strip_currency_from_str(cls, s):
-        return MaasserCurrency.strip_re.sub('', s)
+        return float(MaasserCurrency.strip_re.sub('', s))
 

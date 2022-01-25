@@ -321,7 +321,7 @@ class MaasserUserDatabase(Database.DatabaseHelper):
         data = []
         for k in data2:
             kk = k
-            amount = float(MaasserCurrency.strip_currency_from_str(str(kk['amount_original'])))
+            amount = MaasserCurrency.strip_currency_from_str(str(kk['amount_original']))
             kk['amount'] = MaasserCurrency.exchange(amount, kk['currency_current'], currency)
             data += [kk]
 
