@@ -83,6 +83,12 @@ def fun_maasser_nominal(update: Update, context: CallbackContext) -> int:
 def fun_maasser_stop(update: Update, context: CallbackContext) -> int:
     unsubscribe_all(update, context)
 
+    telegram_id = update.effective_user.id
+    maasser_user_db = MaasserUserDatabase()
+    maasser_user = maasser_user_db.get(telegram_id)
+    if maasser_user is not None:
+        maasser_user_db.erase(telegram_id)
+
     send_message("goodbye text", update, context)
 
     return ConversationHandler.END

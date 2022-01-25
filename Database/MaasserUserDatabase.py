@@ -358,3 +358,14 @@ class MaasserUserDatabase(Database.DatabaseHelper):
 
             return not not row
         return True
+
+    def erase(self, telegram_id):
+        row = self.cur.execute(
+            'DELETE FROM %s'
+            ' WHERE telegram_id = ?;' % self.table_name,
+            (telegram_id, )
+        )
+        self.con.commit()
+
+        return row
+
