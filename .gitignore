@@ -1,5 +1,4 @@
 /Storage/config.py
-/Storage/IsraEventList_bot
 .gitsecret/keys/random_seed
-/Storage/IsraEventList.db
-/Storage/IsraEventListAdmin_bot
+/Storage/*.db
+/Storage/*_bot
