@@ -1,3 +1,4 @@
+import urllib3
 from telegram import BotCommand
 from telegram.ext import (
     Updater,
@@ -5,19 +6,12 @@ from telegram.ext import (
     MessageHandler,
     Filters,
     ConversationHandler,
-    CallbackQueryHandler,
     PicklePersistence,
 )
-
-from typing import Optional
 
 import Database
 from Storage.config import TOKEN
 
-from internals import *
-from Database.MaasserUserDatabase import MaasserUserDatabase
-
-from maasser_state_management import *
 from maasser_give import *
 from maasser_login import *
 from maasser_view import *
@@ -120,7 +114,7 @@ def main():
     try:
         for lang in ["fr", "il", "en"]:
             updater.bot.set_my_commands([BotCommand(c, d) for (c, d) in get_maasser_raw_commands(lang)])
-    except:
+    except urllib3.exceptions.HTTPError:
         pass
 
     dispatcher = updater.dispatcher
@@ -170,5 +164,5 @@ def main():
 
 
 if __name__ == '__main__':
-    updater = main()
-    updater.idle()
+    updater_main = main()
+    updater_main.idle()

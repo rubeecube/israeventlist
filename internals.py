@@ -8,15 +8,16 @@ from telegram import ParseMode
 import datetime
 import dateparser
 
+
 def get_lang(update: Update):
-    #try:
+    # try:
     #    return update.effective_message.from_user.language_code
-    #except AttributeError:
+    # except AttributeError:
     #    pass
 
-    #try:
+    # try:
     #    return update.callback_query.from_user.language_code
-    #except AttributeError:
+    # except AttributeError:
     #    pass
 
     return "en"

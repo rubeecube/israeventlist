@@ -1,7 +1,7 @@
 import datetime
 
 from forex_python.converter import CurrencyRates
-from datetime import timedelta, datetime
+from datetime import datetime
 
 import re
 

@@ -1,13 +1,9 @@
-import datetime
 from typing import Literal
 from internals import *
 from maasser_state_management import *
 
-import dateparser
-
 from Database.MaasserUserDatabase import MaasserUserDatabase
 from maasser_currency import MaasserCurrency
-from ReplyMarkupHelper import ReplyMarkupHelper
 
 
 def fun_maasser_give_annex(update: Update, context: CallbackContext, return_status: int) -> int:

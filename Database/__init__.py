@@ -61,7 +61,7 @@ class Database:
     cur = None
     path = 'Storage/IsraEventList.db'
 
-    def __init__(self, path='Storage/IsraEventList.db'):
+    def __init__(self):
         self.con = sqlite3.connect(os.path.abspath(self.path))
         self.cur = self.con.cursor()
 

@@ -118,16 +118,6 @@ class MaasserUser(Unit):
     database_class = MaasserUserDatabase
     attr = ['telegram_id', 'percentage', 'currency', 'public_key', 'encrypted_private_key', 'encrypted_data']
 
-    def __init__(self, telegram_id=None):
-        if telegram_id is None:
-            super(MaasserUser, self).__init__()
-            return
-
-        maasser_db = MaasserUserDatabase()
-        maasser_user = maasser_db.get(telegram_id)
-        user = MaasserUser.get
-        super(MaasserUser, self).__init__()
-
 
 class Interest(Unit):
     database_class = InterestDatabase

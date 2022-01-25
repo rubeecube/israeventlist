@@ -9,8 +9,6 @@ from telegram.ext import (
     PicklePersistence
 )
 
-from typing import Optional
-
 from Storage.config import TOKEN, ADMINS
 
 from admin_add_event import *
@@ -116,5 +114,5 @@ def main():
 
 
 if __name__ == '__main__':
-    updater = main()
-    updater.idle()
+    updater_main = main()
+    updater_main.idle()

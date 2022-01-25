@@ -120,7 +120,7 @@ class MaasserUserDatabase(Database.DatabaseHelper):
 
         percentage = 10
 
-        currency = MaasserUserDatabase.CURRENCY_ILS
+        currency = MaasserCurrency.CURRENCY_ILS
 
         encrypted_data = json.dumps(
             {
@@ -220,7 +220,7 @@ class MaasserUserDatabase(Database.DatabaseHelper):
                 }
             )
 
-            row = self.cur.execute(
+            self.cur.execute(
                 'UPDATE %s'
                 ' SET'
                 ' encrypted_data = ?'
