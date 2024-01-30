@@ -140,6 +140,7 @@ dic = {
     "MASR: changed": "Changé!",
     "MASR: removed": "Supprimé!",
     "MASR: error": "Erreur...",
+    "MASR: comment": "Description",
 
     "MASR: currency ask": "Quel est la nouvelle devise à appliquer (EUR, ILS, USD)?",
 

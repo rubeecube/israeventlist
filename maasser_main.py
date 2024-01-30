@@ -137,6 +137,7 @@ def main():
             MAASSER_PASSWORD_INIT: [MessageHandler(Filters.all & ~Filters.command, fun_maasser_password_init)],
             MAASSER_GIVE_AMOUNT: [MessageHandler(Filters.all & ~Filters.command, fun_maasser_give_amount)],
             MAASSER_GIVE_DATE: [MessageHandler(Filters.all & ~Filters.command, fun_maasser_give_date)],
+            MAASSER_GIVE_COMMENT: [MessageHandler(Filters.all & ~Filters.command, fun_maasser_give_comment)],
             MAASSER_RECEIVE_AMOUNT: [MessageHandler(Filters.all & ~Filters.command, fun_maasser_receive_amount)],
             MAASSER_RECEIVE_DATE: [MessageHandler(Filters.all & ~Filters.command, fun_maasser_receive_date)],
             MAASSER_VIEW: [MessageHandler(Filters.all & ~Filters.command, fun_maasser_view_print)],

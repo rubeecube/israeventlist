@@ -15,6 +15,28 @@ def fun_maasser_give_annex(update: Update, context: CallbackContext, return_stat
         send_message("MASR: user not found", update, context)
         return MAASSER_PASSWORD_INIT
 
+    send_message("MASR: comment", update, context)
+
+    return return_status
+
+
+def fun_maasser_give_annex_comment(update: Update, context: CallbackContext, return_status: int) -> int:
+    telegram_id = update.effective_user.id
+    maasser_user_db = MaasserUserDatabase()
+    maasser_user = maasser_user_db.get(telegram_id)
+    if maasser_user is None:
+        send_message("MASR: welcome text", update, context)
+        send_message("MASR: user not found", update, context)
+        return MAASSER_PASSWORD_INIT
+
+    message = get_message(update)
+    comment = get_message_text(update)
+    message.delete()
+
+    context.chat_data['ADD'] = {
+        'comment': comment
+    }
+
     reply_markup = ReplyKeyboardMarkup(
         [
             [localize('Yesterday', get_lang(update))],
@@ -83,6 +105,7 @@ def fun_maasser_give_annex_amount(update: Update, context: CallbackContext,
         'amount_original': amount_original,
         'currency_current': currency,
         'type': data_type,
+        'comment': context.chat_data['ADD']['comment'],
         'amount': amount
     }
 
@@ -96,11 +119,15 @@ def fun_maasser_give_annex_amount(update: Update, context: CallbackContext,
 
 
 def fun_maasser_give(update: Update, context: CallbackContext) -> int:
-    return fun_maasser_give_annex(update, context, MAASSER_GIVE_DATE)
+    return fun_maasser_give_annex(update, context, MAASSER_GIVE_COMMENT)
 
 
 def fun_maasser_give_date(update: Update, context: CallbackContext) -> int:
     return fun_maasser_give_annex_date(update, context, MAASSER_GIVE_AMOUNT)
+
+
+def fun_maasser_give_comment(update: Update, context: CallbackContext) -> int:
+    return fun_maasser_give_annex_comment(update, context, MAASSER_GIVE_DATE)
 
 
 def fun_maasser_give_amount(update: Update, context: CallbackContext) -> int:

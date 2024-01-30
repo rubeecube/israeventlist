@@ -41,8 +41,12 @@ def fun_maasser_edit_print(update: Update, context: CallbackContext) -> int:
 
     data_reply = []
     for d in data:
+        try:
+            comment = d['comment']
+        except KeyError:
+            comment = ""
         h = MaasserUserDatabase.fingerprint(d)
-        s = f"{parse_date_db(d['date'])} - {MaasserCurrency.strip_currency_from_str(str(d['amount_original']))} {MaasserCurrency.currency_to_str(d['currency_current'])}"
+        s = f"{parse_date_db(d['date'])} - {MaasserCurrency.strip_currency_from_str(str(d['amount_original']))} {MaasserCurrency.currency_to_str(d['currency_current'])} - {comment}"
         data_reply += [[s, h]]
 
     reply_markup = ReplyMarkupHelper.generic_build_reply_markup(
