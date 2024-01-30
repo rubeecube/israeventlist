@@ -62,10 +62,8 @@ def fun_maasser_give_annex_date(update: Update, context: CallbackContext, return
     message.delete()
 
     try:
-        context.chat_data['ADD'] = {
-            'parsed_date': parse_date(date),
-            'original_date': date
-        }
+        context.chat_data['ADD']['parsed_date'] = parse_date(date)
+        context.chat_data['ADD']['original_date'] = date
     except (TypeError, ValueError):
         send_message('MASR: error', update, context)
         return MAASSER_NOMINAL
