@@ -120,12 +120,12 @@ def fun_maasser_give(update: Update, context: CallbackContext) -> int:
     return fun_maasser_give_annex(update, context, MAASSER_GIVE_COMMENT)
 
 
-def fun_maasser_give_date(update: Update, context: CallbackContext) -> int:
-    return fun_maasser_give_annex_date(update, context, MAASSER_GIVE_AMOUNT)
-
-
 def fun_maasser_give_comment(update: Update, context: CallbackContext) -> int:
     return fun_maasser_give_annex_comment(update, context, MAASSER_GIVE_DATE)
+
+
+def fun_maasser_give_date(update: Update, context: CallbackContext) -> int:
+    return fun_maasser_give_annex_date(update, context, MAASSER_GIVE_AMOUNT)
 
 
 def fun_maasser_give_amount(update: Update, context: CallbackContext) -> int:
@@ -133,7 +133,11 @@ def fun_maasser_give_amount(update: Update, context: CallbackContext) -> int:
 
 
 def fun_maasser_receive(update: Update, context: CallbackContext) -> int:
-    return fun_maasser_give_annex(update, context, MAASSER_RECEIVE_DATE)
+    return fun_maasser_give_annex(update, context, MAASSER_RECEIVE_COMMENT)
+
+
+def fun_maasser_receive_comment(update: Update, context: CallbackContext) -> int:
+    return fun_maasser_give_annex_comment(update, context, MAASSER_RECEIVE_DATE)
 
 
 def fun_maasser_receive_date(update: Update, context: CallbackContext) -> int:

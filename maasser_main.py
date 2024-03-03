@@ -140,6 +140,7 @@ def main():
             MAASSER_GIVE_COMMENT: [MessageHandler(Filters.all & ~Filters.command, fun_maasser_give_comment)],
             MAASSER_RECEIVE_AMOUNT: [MessageHandler(Filters.all & ~Filters.command, fun_maasser_receive_amount)],
             MAASSER_RECEIVE_DATE: [MessageHandler(Filters.all & ~Filters.command, fun_maasser_receive_date)],
+            MAASSER_RECEIVE_COMMENT: [MessageHandler(Filters.all & ~Filters.command, fun_maasser_receive_comment)],
             MAASSER_VIEW: [MessageHandler(Filters.all & ~Filters.command, fun_maasser_view_print)],
             MAASSER_PERCENTAGE: [MessageHandler(Filters.all & ~Filters.command, fun_maasser_percentage_change)],
             MAASSER_CURRENCY: [MessageHandler(Filters.all & ~Filters.command, fun_maasser_currency_password)],
