@@ -35,6 +35,6 @@ def fun_maasser_edit_handle(update: Update, context: CallbackContext) -> int:
         return MAASSER_PASSWORD_INIT
 
     maasser_user_db.remove_data(telegram_id, query)
-    edit_message("MASR: removed", update, context)
+    send_message("MASR: removed", update, context)
 
     return MAASSER_NOMINAL
