@@ -134,6 +134,7 @@ dic = {
     "MASR: command devise": "Changer la devise par défaut",
     "MASR: command recap": "Afficher un tableau récaputilatif",
     "MASR: command edit": "Supprimer une entrée",
+    "MASR: command show": "Lister les entrées",
 
     "MASR: choose edit": "Choisir la ligne à supprimer",
     "MASR: percentage ask": "Quel est le nouveau pourcentage à appliquer?",

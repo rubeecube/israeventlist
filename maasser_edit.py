@@ -39,22 +39,7 @@ def fun_maasser_edit_print(update: Update, context: CallbackContext) -> int:
         send_message("MASR: invalid, bad password?", update, context)
         return MAASSER_NOMINAL
 
-    data_reply = []
-    for d in data:
-        try:
-            comment = d['comment']
-        except KeyError:
-            comment = ""
-        h = MaasserUserDatabase.fingerprint(d)
-        s = f"{parse_date_db(d['date'])} - {MaasserCurrency.strip_currency_from_str(str(d['amount_original']))} {MaasserCurrency.currency_to_str(d['currency_current'])} - {comment}"
-        data_reply += [[s, h]]
-
-    reply_markup = ReplyMarkupHelper.generic_build_reply_markup(
-        data_reply,
-        multi_select=False
-    )
-
-    send_message("MASR: choose edit", update, context, reply_markup=reply_markup)
+    send_message("Fingerprint? (You can access the fingerprint using /list)", update, context)
 
     return MAASSER_EDIT_HANDLE
 

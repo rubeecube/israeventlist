@@ -55,6 +55,7 @@ def fun_maasser_list_print(update: Update, context: CallbackContext) -> int:
         except KeyError:
             comment = ""
         table_pt.add_row([
+            MaasserUserDatabase.fingerprint(d),
             parse_date_db(d['date']),
             comment,
             f"{MaasserCurrency.strip_currency_from_str(str(d['amount_original']))} {MaasserCurrency.currency_to_str(d['currency_current'])}",
