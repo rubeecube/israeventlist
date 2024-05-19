@@ -57,7 +57,7 @@ def fun_maasser_list_print(update: Update, context: CallbackContext) -> int:
             comment = d['comment']
         except KeyError:
             comment = ""
-        if d['data_type'] == 'GIVE':
+        if d['type'] == 'GIVE':
             c = '-'
         else:
             c = '+'
