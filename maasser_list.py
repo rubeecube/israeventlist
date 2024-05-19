@@ -41,6 +41,7 @@ def fun_maasser_list_print(update: Update, context: CallbackContext) -> int:
         return MAASSER_NOMINAL
 
     table_pt = pt.PrettyTable([
+        localize('ID'),
         localize('Date', get_lang(update)),
         localize('Comment', get_lang(update)),
         localize('MASR: amount table--format', get_lang(update)).format(
