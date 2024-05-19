@@ -39,7 +39,7 @@ def fun_maasser_edit_print(update: Update, context: CallbackContext) -> int:
         send_message("MASR: invalid, bad password?", update, context)
         return MAASSER_NOMINAL
 
-    send_message("Fingerprint? (You can access the fingerprint using /list)", update, context)
+    send_message("Fingerprint? (You can access the fingerprint using /show)", update, context)
 
     return MAASSER_EDIT_HANDLE
 
