@@ -40,6 +40,8 @@ def fun_maasser_list_print(update: Update, context: CallbackContext) -> int:
         send_message("MASR: invalid, bad password?", update, context)
         return MAASSER_NOMINAL
 
+    max = 2000
+
     table_pt = pt.PrettyTable([
         localize('Fingerprint', get_lang(update)),
         localize('Date', get_lang(update)),
@@ -61,6 +63,18 @@ def fun_maasser_list_print(update: Update, context: CallbackContext) -> int:
             comment,
             f"{MaasserCurrency.strip_currency_from_str(str(d['amount_original']))} {MaasserCurrency.currency_to_str(d['currency_current'])}",
         ])
+        if len(str(table_pt)) > max:
+            send_message(f'<pre>{table_pt}</pre>', update, context, html=True)
+
+            table_pt = pt.PrettyTable([
+                localize('Fingerprint', get_lang(update)),
+                localize('Date', get_lang(update)),
+                localize('Comment', get_lang(update)),
+                localize('MASR: amount table--format', get_lang(update)).format(
+                    MaasserCurrency.currency_to_str(maasser_user.currency)
+                )
+            ])
+            table_pt.align['Amount'] = 'r'
 
     send_message(f'<pre>{table_pt}</pre>', update, context, html=True)
 
