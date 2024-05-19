@@ -198,7 +198,7 @@ class MaasserUserDatabase(Database.DatabaseHelper):
 
     @staticmethod
     def fingerprint(data):
-        return hashlib.sha256(json.dumps(data).encode()).hexdigest()
+        return hashlib.sha256(json.dumps(data).encode()).hexdigest()[:8]
 
     def consolidate(self, telegram_id, password, save=True):
         maasser_user = self.get(telegram_id)
