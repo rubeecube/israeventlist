@@ -18,11 +18,12 @@ from maasser_login import *
 from maasser_view import *
 from maasser_change import *
 from maasser_edit import *
+from maasser_list import *
 
 
 def get_maasser_raw_commands(lang="fr"):
     commands = []
-    for command in ["commands", "recap", "don", "salaire", "maasser", "devise", "edit", "contact", "details", "stop"]:
+    for command in ["commands", "recap", "don", "salaire", "list", "maasser", "devise", "edit", "contact", "details", "stop"]:
         commands += [
             ("/%s" % command, "%s" % localize("MASR: command %s" % command, lang)),
         ]
@@ -147,6 +148,8 @@ def main():
             MAASSER_CURRENCY_PASSWORD: [MessageHandler(Filters.all & ~Filters.command, fun_maasser_currency_change)],
             MAASSER_EDIT: [MessageHandler(Filters.all & ~Filters.command, fun_maasser_edit_print)],
             MAASSER_EDIT_HANDLE: [CallbackQueryHandler(fun_maasser_edit_handle)],
+            MAASSER_LIST: [MessageHandler(Filters.all & ~Filters.command, fun_maasser_list_print)],
+
         },
         name="Maasser_bot",
         fallbacks=[
@@ -164,6 +167,7 @@ def main():
             CommandHandler('maasser', fun_maasser_percentage),
             CommandHandler('devise', fun_maasser_currency),
             CommandHandler('edit', fun_maasser_edit),
+            CommandHandler('list', fun_maasser_list),
         ],
         persistent=True,
         allow_reentry=True
