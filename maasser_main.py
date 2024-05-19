@@ -146,7 +146,7 @@ def main():
             MAASSER_PERCENTAGE: [MessageHandler(Filters.all & ~Filters.command, fun_maasser_percentage_change)],
             MAASSER_CURRENCY: [MessageHandler(Filters.all & ~Filters.command, fun_maasser_currency_password)],
             MAASSER_CURRENCY_PASSWORD: [MessageHandler(Filters.all & ~Filters.command, fun_maasser_currency_change)],
-            MAASSER_EDIT_HANDLE: [CallbackQueryHandler(fun_maasser_edit_handle)],
+            MAASSER_EDIT_HANDLE: [MessageHandler(fun_maasser_edit_handle)],
             MAASSER_LIST: [MessageHandler(Filters.all & ~Filters.command, fun_maasser_list_print)],
 
         },
