@@ -9,21 +9,13 @@ from maasser_currency import MaasserCurrency
 
 def fun_maasser_edit(update: Update, context: CallbackContext) -> int:
     telegram_id = update.effective_user.id
-    password = get_message_text(update)
-    get_message(update).delete()
 
     maasser_user_db = MaasserUserDatabase()
-
     maasser_user = maasser_user_db.get(telegram_id)
     if maasser_user is None:
         send_message("MASR: welcome text", update, context)
         send_message("MASR: user not found", update, context)
         return MAASSER_PASSWORD_INIT
-
-    data = maasser_user_db.consolidate(telegram_id, password)
-    if data is None:
-        send_message("MASR: invalid, bad password?", update, context)
-        return MAASSER_NOMINAL
 
     send_message("Fingerprint? (You can access the fingerprint using /show)", update, context)
 
