@@ -144,11 +144,13 @@ dic = {
     "MASR: comment": "Description",
 
     "MASR: currency ask": "Quel est la nouvelle devise à appliquer (EUR, ILS, USD)?",
+    "MASR: fingeprint?": "Reference? (Vous pouvez recuperer la reference avec la fonction /show)",
+    "MASR: fingerprint show": "Reference",
+    "MASR: date show": "Date",
 
     'Yesterday': 'Hier',
     'Today': "Aujourd'hui",
     'month': "Mois",
-
 }
 
 

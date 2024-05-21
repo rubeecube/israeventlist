@@ -17,7 +17,7 @@ def fun_maasser_edit(update: Update, context: CallbackContext) -> int:
         send_message("MASR: user not found", update, context)
         return MAASSER_PASSWORD_INIT
 
-    send_message("Fingerprint? (You can access the fingerprint using /show)", update, context)
+    send_message("MASR: fingeprint?", update, context)
 
     return MAASSER_EDIT_HANDLE
 

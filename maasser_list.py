@@ -42,14 +42,16 @@ def fun_maasser_list_print(update: Update, context: CallbackContext) -> int:
 
     max = 4000
 
-    table_pt = pt.PrettyTable([
-        localize('Fingerprint', get_lang(update)),
-        localize('Date', get_lang(update)),
-        localize('Comment', get_lang(update)),
+    headers = [
+        localize('MASR: fingerprint show', get_lang(update)),
+        localize('MASR: date show', get_lang(update)),
+        localize('MASR: comment', get_lang(update)),
         localize('MASR: amount table--format', get_lang(update)).format(
             MaasserCurrency.currency_to_str(maasser_user.currency)
         )
-    ])
+    ]
+
+    table_pt = pt.PrettyTable(headers)
     table_pt.align['Amount'] = 'r'
 
     for d in data:
@@ -70,14 +72,7 @@ def fun_maasser_list_print(update: Update, context: CallbackContext) -> int:
         if len(str(table_pt)) > max:
             send_message(f'<pre>{table_pt}</pre>', update, context, html=True)
 
-            table_pt = pt.PrettyTable([
-                localize('Fingerprint', get_lang(update)),
-                localize('Date', get_lang(update)),
-                localize('Comment', get_lang(update)),
-                localize('MASR: amount table--format', get_lang(update)).format(
-                    MaasserCurrency.currency_to_str(maasser_user.currency)
-                )
-            ])
+            table_pt = pt.PrettyTable(headers)
             table_pt.align['Amount'] = 'r'
 
     send_message(f'<pre>{table_pt}</pre>', update, context, html=True)
