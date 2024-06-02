@@ -10,15 +10,15 @@ import dateparser
 
 
 def get_lang(update: Update):
-    # try:
-    #    return update.effective_message.from_user.language_code
-    # except AttributeError:
-    #    pass
+    try:
+       return update.effective_message.from_user.language_code
+    except AttributeError:
+       pass
 
-    # try:
-    #    return update.callback_query.from_user.language_code
-    # except AttributeError:
-    #    pass
+    try:
+       return update.callback_query.from_user.language_code
+    except AttributeError:
+       pass
 
     return "en"
 
@@ -199,6 +199,8 @@ def datetime_to_db(date: datetime.datetime) -> str:
 
 
 def parse_date(date: str) -> datetime.datetime:
+    print(date)
+    print(dateparser.parse(date, locales=['fr-FR', 'en-GB']))
     return dateparser.parse(date, locales=['fr-FR', 'en-GB']).date()
 
 
