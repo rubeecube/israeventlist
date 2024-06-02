@@ -198,11 +198,8 @@ def datetime_to_db(date: datetime.datetime) -> str:
     return date.strftime('%Y-%m-%d')
 
 
-def parse_date(date: str) -> datetime.datetime:
-    print(date)
-    print(dateparser.parse(date, locales=['fr-FR', 'en-GB']))
-    print(dateparser.parse(date, locales=['fr-FR', 'en-GB']).date())
-    return dateparser.parse(date, locales=['fr-FR', 'en-GB']).date()
+def parse_date(date: str, lang='en') -> datetime.datetime:
+    return dateparser.parse(date, languages=[lang]).date()
 
 
 def parse_date_db(date: str) -> datetime.datetime:
