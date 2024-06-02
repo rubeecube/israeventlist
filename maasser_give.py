@@ -59,8 +59,6 @@ def fun_maasser_give_annex_date(update: Update, context: CallbackContext, return
 
     message = get_message(update)
     date = get_message_text(update)
-    print(message)
-    print(date)
     message.delete()
 
     try:
