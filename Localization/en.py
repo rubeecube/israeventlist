@@ -147,7 +147,7 @@ dic = {
 
     'Yesterday': 'Yesterday',
     'Today': "Today",
-    'month': "Month",
+    'month': "Month"
 }
 
 

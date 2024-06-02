@@ -199,7 +199,7 @@ def datetime_to_db(date: datetime.datetime) -> str:
 
 
 def parse_date(date: str) -> datetime.datetime:
-    return dateparser.parse(date, locales=['fr']).date()
+    return dateparser.parse(date, locales=['fr-FR', 'en-GB']).date()
 
 
 def parse_date_db(date: str) -> datetime.datetime:
