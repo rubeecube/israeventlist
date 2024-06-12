@@ -151,6 +151,7 @@ dic = {
     'Yesterday': 'Hier',
     'Today': "Aujourd'hui",
     'month': "Mois",
+    'MASR: total': "Total",
 }
 
 
