@@ -109,6 +109,7 @@ def fun_maasser_give_annex_amount(update: Update, context: CallbackContext,
 
     maasser_user = maasser_user_db.add_data(telegram_id, data)
     if maasser_user:
+        send_message(f"{context.chat_data['ADD']['comment']} ({parse_date_db(datetime_to_db(context.chat_data['ADD']['parsed_date']))}): {amount}", update, context)
         send_message("MASR: added", update, context)
     else:
         send_message("MASR: error", update, context)
