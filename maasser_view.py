@@ -62,11 +62,10 @@ def fun_maasser_view_print(update: Update, context: CallbackContext) -> int:
     for k in list(table.keys()):
         table_pt.add_row([k, f'{table[k]:.2f}'])
 
-    table_pt.add_row(["", localize("MASR: total", get_lang(update)), f'{totalsum:.2f}'])
-
     send_message(localize("MASR: percentage", get_lang(update)) + f": {maasser_user.percentage}%",
                  update, context, local=False)
     send_message("MASR: explain table", update, context)
     send_message(f'<pre>{table_pt}</pre>', update, context, html=True)
+    send_message(f'{localize("MASR: total", get_lang(update))}: {totalsum:.2f}')
 
     return MAASSER_NOMINAL
