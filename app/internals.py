@@ -64,30 +64,30 @@ def get_message(update: Update):
         return update.callback_query.message
 
 
-def edit_message(message, update: Update, context: CallbackContext, reply_markup: InlineKeyboardMarkup = None,
-                 local: bool = True):
+async def edit_message(message, update: Update, context: CallbackContext, reply_markup: InlineKeyboardMarkup = None,
+                       local: bool = True):
     if local:
         message = localize(message, get_lang(update))
 
     if update.message is not None:
-        context.bot.edit_message_text(text=message,
-                                      chat_id=update.message.chat_id,
-                                      message_id=update.message.message_id,
-                                      reply_markup=reply_markup)
+        await context.bot.edit_message_text(text=message,
+                                            chat_id=update.message.chat_id,
+                                            message_id=update.message.message_id,
+                                            reply_markup=reply_markup)
 
     if update.callback_query is not None:
-        context.bot.edit_message_text(text=message,
-                                      chat_id=update.callback_query.message.chat.id,
-                                      message_id=update.callback_query.message.message_id,
-                                      inline_message_id=update.callback_query.inline_message_id,
-                                      reply_markup=reply_markup)
+        await context.bot.edit_message_text(text=message,
+                                            chat_id=update.callback_query.message.chat.id,
+                                            message_id=update.callback_query.message.message_id,
+                                            inline_message_id=update.callback_query.inline_message_id,
+                                            reply_markup=reply_markup)
 
 
-def send_message(message, update: Update,
-                 context: CallbackContext,
-                 reply_markup: Union[InlineKeyboardMarkup, ReplyKeyboardMarkup] = None,
-                 local: bool = True,
-                 html: bool = None):
+async def send_message(message, update: Update,
+                       context: CallbackContext,
+                       reply_markup: Union[InlineKeyboardMarkup, ReplyKeyboardMarkup] = None,
+                       local: bool = True,
+                       html: bool = None):
     if local:
         message = localize(message, get_lang(update))
 
@@ -96,11 +96,11 @@ def send_message(message, update: Update,
         parse_mode = 'HTML'
 
     if update.message is not None:
-        update.message.reply_text(text=message, reply_markup=reply_markup, parse_mode=parse_mode)
+        await update.message.reply_text(text=message, reply_markup=reply_markup, parse_mode=parse_mode)
 
     if update.callback_query is not None:
-        context.bot.send_message(text=message, chat_id=update.callback_query.message.chat.id, reply_markup=reply_markup,
-                                 parse_mode=parse_mode)
+        await context.bot.send_message(text=message, chat_id=update.callback_query.message.chat.id,
+                                       reply_markup=reply_markup, parse_mode=parse_mode)
 
 
 def datetime_to_db(d: datetime.datetime) -> str:

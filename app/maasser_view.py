@@ -10,11 +10,11 @@ async def fun_maasser_view(update: Update, context: CallbackContext) -> int:
     maasser_user_db = MaasserUserDatabase()
     maasser_user = maasser_user_db.get(telegram_id)
     if maasser_user is None:
-        send_message("MASR: welcome text", update, context)
-        send_message("MASR: user not found", update, context)
+        await send_message("MASR: welcome text", update, context)
+        await send_message("MASR: user not found", update, context)
         return MAASSER_PASSWORD_INIT
 
-    send_message("MASR: password?", update, context)
+    await send_message("MASR: password?", update, context)
 
     return MAASSER_VIEW
 
@@ -22,19 +22,19 @@ async def fun_maasser_view(update: Update, context: CallbackContext) -> int:
 async def fun_maasser_view_print(update: Update, context: CallbackContext) -> int:
     telegram_id = update.effective_user.id
     password = get_message_text(update)
-    get_message(update).delete()
+    await get_message(update).delete()
 
     maasser_user_db = MaasserUserDatabase()
 
     maasser_user = maasser_user_db.get(telegram_id)
     if maasser_user is None:
-        send_message("MASR: welcome text", update, context)
-        send_message("MASR: user not found", update, context)
+        await send_message("MASR: welcome text", update, context)
+        await send_message("MASR: user not found", update, context)
         return MAASSER_PASSWORD_INIT
 
     data = maasser_user_db.consolidate(telegram_id, password)
     if data is None:
-        send_message("MASR: invalid, bad password?", update, context)
+        await send_message("MASR: invalid, bad password?", update, context)
         return MAASSER_NOMINAL
 
     table_pt = pt.PrettyTable([
@@ -62,10 +62,10 @@ async def fun_maasser_view_print(update: Update, context: CallbackContext) -> in
     for k in list(table.keys()):
         table_pt.add_row([k, f'{table[k]:.2f}'])
 
-    send_message(localize("MASR: percentage", get_lang(update)) + f": {maasser_user.percentage}%",
+    await send_message(localize("MASR: percentage", get_lang(update)) + f": {maasser_user.percentage}%",
                  update, context, local=False)
-    send_message("MASR: explain table", update, context)
-    send_message(f'<pre>{table_pt}</pre>', update, context, html=True)
-    send_message(f'{localize("MASR: total", get_lang(update))}: {totalsum:.2f}', update, context)
+    await send_message("MASR: explain table", update, context)
+    await send_message(f'<pre>{table_pt}</pre>', update, context, html=True)
+    await send_message(f'{localize("MASR: total", get_lang(update))}: {totalsum:.2f}', update, context)
 
     return MAASSER_NOMINAL

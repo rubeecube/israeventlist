@@ -7,7 +7,7 @@ import re
 
 
 class MaasserCurrency:
-    strip_re = re.compile('eur|ils|usd|€|₪|\$', re.IGNORECASE)
+    strip_re = re.compile(f"eur|ils|usd|€|₪|{re.escape('$')}", re.IGNORECASE)
     CURRENCIES = [CURRENCY_ILS, CURRENCY_EUR, CURRENCY_USD] = range(3)
 
     exchanges_rates = None

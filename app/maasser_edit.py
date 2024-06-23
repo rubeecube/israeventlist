@@ -9,11 +9,11 @@ async def fun_maasser_edit(update: Update, context: CallbackContext) -> int:
     maasser_user_db = MaasserUserDatabase()
     maasser_user = maasser_user_db.get(telegram_id)
     if maasser_user is None:
-        send_message("MASR: welcome text", update, context)
-        send_message("MASR: user not found", update, context)
+        await send_message("MASR: welcome text", update, context)
+        await send_message("MASR: user not found", update, context)
         return MAASSER_PASSWORD_INIT
 
-    send_message("MASR: fingeprint?", update, context)
+    await send_message("MASR: fingeprint?", update, context)
 
     return MAASSER_EDIT_HANDLE
 
@@ -26,11 +26,11 @@ async def fun_maasser_edit_handle(update: Update, context: CallbackContext) -> i
 
     maasser_user = maasser_user_db.get(telegram_id)
     if maasser_user is None:
-        send_message("MASR: welcome text", update, context)
-        send_message("MASR: user not found", update, context)
+        await send_message("MASR: welcome text", update, context)
+        await send_message("MASR: user not found", update, context)
         return MAASSER_PASSWORD_INIT
 
     maasser_user_db.remove_data(telegram_id, query)
-    send_message("MASR: removed", update, context)
+    await send_message("MASR: removed", update, context)
 
     return MAASSER_NOMINAL

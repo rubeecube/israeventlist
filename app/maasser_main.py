@@ -2,7 +2,6 @@ import urllib3
 from telegram import BotCommand
 from telegram.ext import (
     Application,
-    Updater,
     CommandHandler,
     MessageHandler,
     filters,
@@ -53,12 +52,12 @@ async def fun_maasser_start(update: Update, context: CallbackContext) -> Optiona
     maasser_user_db = MaasserUserDatabase()
     maasser_user = maasser_user_db.get(telegram_id)
     if maasser_user is None:
-        send_message("MASR: welcome text", update, context)
-        send_message("MASR: user not found", update, context)
+        await send_message("MASR: welcome text", update, context)
+        await send_message("MASR: user not found", update, context)
         return MAASSER_PASSWORD_INIT
 
-    send_message("MASR: welcome text", update, context)
-    send_message("MASR: user found", update, context)
+    await send_message("MASR: welcome text", update, context)
+    await send_message("MASR: user found", update, context)
 
     return MAASSER_NOMINAL
 
@@ -66,7 +65,7 @@ async def fun_maasser_start(update: Update, context: CallbackContext) -> Optiona
 async def fun_maasser_commands(update: Update, context: CallbackContext) -> Optional[int]:
     reply = get_maasser_commands(get_lang(update), exclude=["/stop"])
 
-    send_message("MASR: command list", update, context, reply_markup=reply)
+    await send_message("MASR: command list", update, context, reply_markup=reply)
 
     return MAASSER_NOMINAL
 
@@ -77,7 +76,7 @@ async def fun_maasser_finish_init(update: Update, context: CallbackContext) -> i
 
 async def fun_maasser_nominal(update: Update, context: CallbackContext) -> int:
     if update.message.text == localize("exit menu", get_lang(update)):
-        send_message('inform commands', update, context)
+        await send_message('inform commands', update, context)
 
     return MAASSER_NOMINAL
 
@@ -89,24 +88,24 @@ async def fun_maasser_stop(update: Update, context: CallbackContext) -> int:
     if maasser_user is not None:
         maasser_user_db.erase(telegram_id)
 
-    send_message("goodbye text", update, context)
+    await send_message("goodbye text", update, context)
 
     return ConversationHandler.END
 
 
 async def fun_maasser_contact(update: Update, context: CallbackContext) -> None:
-    send_message("contact us", update, context)
+    await send_message("contact us", update, context)
     await update.message.reply_text("https://telegram.me/RubeeCube")
     return
 
 
 async def fun_maasser_details(update: Update, context: CallbackContext) -> None:
-    send_message("MASR: details", update, context)
+    await send_message("MASR: details", update, context)
     return
 
 
 async def fun_maasser_details2(update: Update, context: CallbackContext) -> None:
-    send_message("MASR: details2", update, context)
+    await send_message("MASR: details2", update, context)
     return
 
 
@@ -114,12 +113,6 @@ def main():
     persistence = PicklePersistence(filepath='Storage/Maasser_bot')
     application = Application.builder().token(TOKEN["Maasser_bot"]).persistence(persistence).build()
     Database.Database.path = 'Storage/Maasser_bot.db'
-
-    try:
-        for lang in ["fr", "il", "en"]:
-            application.bot.set_my_commands([BotCommand(c, d) for (c, d) in get_maasser_raw_commands(lang)])
-    except urllib3.exceptions.HTTPError:
-        pass
 
     conv_handler = ConversationHandler(
         entry_points=[
