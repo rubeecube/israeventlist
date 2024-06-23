@@ -1,0 +1,7 @@
+cryptography
+dateparser
+prettytable
+urllib3
+sniffio
+python-telegram-bot
+forex-python
