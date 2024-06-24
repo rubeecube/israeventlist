@@ -1,6 +1,10 @@
 FROM alpine
 
-RUN apk add --no-cache python3 py3-pip python3-dev gcc
+RUN apk add --no-cache python3 py3-pip
+
+RUN apk add --update --no-cache --virtual .tmp-build-deps \
+    gcc libc-dev linux-headers postgresql-dev \
+    && apk add libffi-dev \
 
 COPY /app/. /app/
 COPY /Storage/* /app/Storage/
