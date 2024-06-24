@@ -37,7 +37,7 @@ RUN apk add --update \
   zlib-dev
 
 COPY /app/. /app/
-COPY /Storage/* /app/Storage/
+#COPY /Storage/* /app/Storage/
 COPY /requirements.txt /app/requirements.txt
 
 WORKDIR /app

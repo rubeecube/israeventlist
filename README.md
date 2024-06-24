@@ -11,7 +11,14 @@ TOKEN = {
 ```
 
 # Run with Docker
-`docker build -t maasser-image . && docker run -it maasser-image`
+## Create a volume
+`docker volume create maasser-storage`
+
+## Run
+```
+docker build -t maasser-image .
+docker run -v maasser-storage:/app/Storage maasser-image
+```
 
 # Run without Docker
 `python3 app/maasser_main.py`
