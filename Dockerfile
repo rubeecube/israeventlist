@@ -42,7 +42,7 @@ COPY /requirements.txt /app/requirements.txt
 
 WORKDIR /app
 
-RUN pip3 install --break-system-packages --upgrade pip && pip3 install --break-system-packages --no-cache-dir --upgrade -r /app/requirements.txt
+RUN pip3 install --break-system-packages --no-cache-dir --upgrade -r /app/requirements.txt
 
 ENV PYTHONPATH=$PYTHONPATH:/app
 

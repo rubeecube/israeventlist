@@ -10,5 +10,8 @@ TOKEN = {
 } 
 ```
 
-# Run
-`python maasser_main.py`
+# Run with Docker
+`docker build -t maasser-image . && docker run -it maasser-image`
+
+# Run without Docker
+`python3 app/maasser_main.py`
