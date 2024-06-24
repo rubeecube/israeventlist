@@ -31,7 +31,7 @@ async def fun_maasser_give_annex_comment(update: Update, context: CallbackContex
 
     message = get_message(update)
     comment = get_message_text(update)
-    message.delete()
+    await message.delete()
 
     context.chat_data['ADD'] = {
         'comment': comment
@@ -59,7 +59,7 @@ async def fun_maasser_give_annex_date(update: Update, context: CallbackContext, 
 
     message = get_message(update)
     date_ = get_message_text(update)
-    message.delete()
+    await message.delete()
 
     try:
         context.chat_data['ADD']['parsed_date'] = parse_date(date_, get_lang(update))
@@ -82,7 +82,7 @@ async def fun_maasser_give_annex_amount(update: Update, context: CallbackContext
     maasser_user = maasser_user_db.get(telegram_id)
     message = get_message(update)
     amount_original = get_message_text(update)
-    message.delete()
+    await message.delete()
     user_currency = maasser_user.currency
 
     amount = amount_original
