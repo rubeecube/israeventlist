@@ -6,12 +6,35 @@ RUN apk add --update --no-cache \
 
 RUN apk add --update --no-cache --virtual \
     .tmp-build-deps \
-    gcc \
     libc-dev \
-    linux-headers \
-    libffi-dev \
-    python3-dev \
-    rust
+    linux-headers
+
+RUN apk add --update \
+  build-base \
+  cairo \
+  cairo-dev \
+  cargo \
+  freetype-dev \
+  gcc \
+  gdk-pixbuf-dev \
+  gettext \
+  jpeg-dev \
+  lcms2-dev \
+  libffi-dev \
+  musl-dev \
+  openjpeg-dev \
+  openssl-dev \
+  pango-dev \
+  poppler-utils \
+  postgresql-client \
+  postgresql-dev \
+  py-cffi \
+  python3-dev \
+  rust \
+  tcl-dev \
+  tiff-dev \
+  tk-dev \
+  zlib-dev
 
 COPY /app/. /app/
 COPY /Storage/* /app/Storage/
