@@ -3,9 +3,8 @@ FROM alpine
 RUN apk add --no-cache python3 py3-pip
 
 COPY /app/. /app/
+COPY /Storage/* /app/Storage
 COPY /requirements.txt /app/requirements.txt
-COPY /config.py /app/Storage/
-COPY /config.py.secret /app/Storage/
 
 WORKDIR /app
 
