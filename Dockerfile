@@ -1,6 +1,6 @@
 FROM alpine
 
-RUN apk add --update --no-cache --virtual \
+RUN apk add --update --no-cache \
     python3 \
     py3-pip
 
