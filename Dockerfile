@@ -1,6 +1,6 @@
 FROM alpine
 
-RUN apk add --no-cache python3 py3-pip
+RUN apk add --no-cache python3 py3-pip gcc
 
 COPY /app/. /app/
 COPY /Storage/* /app/Storage/
