@@ -1,8 +1,10 @@
 FROM alpine
 
-RUN apk add --update --no-cache \
+RUN apk add --update --no-cache --virtual \
     python3 \
-    py3-pip \
+    py3-pip
+
+RUN apk add --update --no-cache --virtual \
     .tmp-build-deps \
     gcc \
     libc-dev \
